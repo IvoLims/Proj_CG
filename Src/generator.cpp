@@ -292,8 +292,3 @@ int main(int argc, char* argv[]){
         constructF(res,fname);
         return 0;
 }
-
-/*Luis preciso de algo deste tipo no resint main(){
-  string res = "1.2 2.3 3.1\n 1 4 5\n 5 6 7\n";
-  constroiF(res,fname);
-}*/
