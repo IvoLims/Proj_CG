@@ -1,45 +1,43 @@
-//Std libs
-
 #include <iostream>
-#include <string> 
+#include <string>
 #include <math.h>
 #include <sstream>
 #include <fstream>
 
 #define _USE_MATH_DEFINES
 #define PI 3.14159265358979323846  /* pi */
-#define PLANE_HEIGHT 4
+#define PLANE_WIDTH 4
 
 using namespace std;
 
 /*---------------Functions that calculates vertices---------------*/
-string gen_Plane(float height){	
-    height /= 2;
+string gen_Plane(float width){
+    width /= 2;
     stringstream ss;
     ss << ":Plane\n";
 
-    ss << height << " " << 0 << " " << height << "\n";
-    ss << height << " " << 0 << " " << -height << "\n";
-    ss << -height << " " << 0 << " " << -height << "\n";
+    ss << width << " " << 0 << " " << width << "\n";
+    ss << width << " " << 0 << " " << -width << "\n";
+    ss << -width << " " << 0 << " " << -width << "\n";
 
     ss << "-------------------------------------\n";
 
-    ss << height << " " << 0 << " " << height << "\n";
-    ss << -height << " " << 0 << " " << -height << "\n";
-    ss << -height << " " << 0 << " " << height << "\n";
+    ss << width << " " << 0 << " " << width << "\n";
+    ss << -width << " " << 0 << " " << -width << "\n";
+    ss << -width << " " << 0 << " " << width << "\n";
 
     ss << "-------------------------------------\n";
 
-    ss << height << " " << 0 << " " << -height << "\n";
-    ss << height << " " << 0 << " " << height << "\n";
-    ss << -height << " " << 0 << " " << -height << "\n";
+    ss << width << " " << 0 << " " << -width << "\n";
+    ss << width << " " << 0 << " " << width << "\n";
+    ss << -width << " " << 0 << " " << -width << "\n";
 
     ss << "-------------------------------------\n";
 
-    ss << -height << " " << 0 << " " << -height << "\n";
-    ss << height << " " << 0 << " " << height << "\n";
-    ss << -height << " " << 0 << " " << height << "\n";
-    
+    ss << -width << " " << 0 << " " << -width << "\n";
+    ss << width << " " << 0 << " " << width << "\n";
+    ss << -width << " " << 0 << " " << width << "\n";
+
     ss << "-------------------------------------\n";
 
     return "4" + ss.str();
@@ -65,7 +63,7 @@ string gen_Box(float x,float y,float z){
     ss << -x << " " << y << " " << z << "\n";
 
     ss << "--Bottom--\n";
-    
+
     ss << x << " " << -y << " " << -z << "\n";
     ss << x << " " << -y << " " << z << "\n";
     ss << -x << " " << -y << " " << -z << "\n";
@@ -77,19 +75,19 @@ string gen_Box(float x,float y,float z){
     ss << -x << " " << -y << " " << z << "\n";
 
     ss << "--Right--\n";
-    
+
     ss << x << " " << -y << " " << -z << "\n";
     ss << x << " " << y << " " << -z << "\n";
     ss << x << " " << y << " " << z << "\n";
 
-    ss << "-------------------------------------\n";    
+    ss << "-------------------------------------\n";
 
     ss << x << " " << -y << " " << -z << "\n";
     ss << x << " " << y << " " << z << "\n";
     ss << x << " " << -y << " " << z << "\n";
 
     ss << "--Left--\n";
-    
+
     ss << -x << " " << y << " " << -z << "\n";
     ss << -x << " " << -y << " " << -z << "\n";
     ss << -x << " " << y << " " << z << "\n";
@@ -101,7 +99,7 @@ string gen_Box(float x,float y,float z){
     ss << -x << " " << -y << " " << z << "\n";
 
     ss << "--Front--\n";
-    
+
     ss << x << " " << -y << " " << z << "\n";
     ss << x << " " << y << " " << z << "\n";
     ss << -x << " " << y << " " << z << "\n";
@@ -113,7 +111,7 @@ string gen_Box(float x,float y,float z){
     ss << -x << " " << -y << " " << z << "\n";
 
     ss << "--Rear--\n";
-    
+
     ss << x << " " << y << " " << -z << "\n";
     ss << x << " " << -y << " " << -z << "\n";
     ss << -x << " " << y << " " << -z << "\n";
@@ -130,9 +128,7 @@ string gen_Box(float x,float y,float z){
 
 }
 
-string gen_Sphere(float radius,int slices,int stacks){  
-    float a = 0;
-    float b = 0;
+string gen_Sphere(float radius,int slices,int stacks){
     float a_interval = 2 * PI / slices;
     float b_interval = PI / stacks;
     float next_a, next_b;
@@ -141,8 +137,8 @@ string gen_Sphere(float radius,int slices,int stacks){
     stringstream ss;
     ss << ":Sphere\n";
 
-    for (; a < 2 * PI; a +=  a_interval) {
-        for (b = -PI/2; b < PI/2; b += b_interval) {
+    for (float a = 0; a < 2 * PI; a +=  a_interval) {
+        for (float b = -PI/2; b < PI/2; b += b_interval) {
             next_a = a + a_interval;
             next_b = b + b_interval;
             if (next_a > 2 * PI) {
@@ -150,7 +146,7 @@ string gen_Sphere(float radius,int slices,int stacks){
             }
             if (next_b > PI / 2) {
                 next_b = PI / 2;
-            }            
+            }
             ss << radius * cos(next_b) * sin(next_a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(next_a) << "\n";
             ss << radius * cos(next_b) * sin(a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(a) << "\n";
             ss << radius * cos(b) * sin(next_a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(next_a) << "\n";
@@ -163,7 +159,7 @@ string gen_Sphere(float radius,int slices,int stacks){
 
             ss << "-------------------------------------\n";
             triangles += 2;
-        }           
+        }
     }
     return to_string(triangles) + ss.str();
 }
@@ -195,7 +191,7 @@ string gen_Cone(float radius,float height,int slices,int stacks){
             if (next_h > height) {
                 next_h = height;
             }
-            ss << "--Walls--\n";         
+            ss << "--Walls--\n";
             ss << radius * sin(next_a) * ((height - next_h) / height) << " " << next_h << " " << radius * cos(next_a) * ((height - next_h) / height) << "\n";
             ss << radius * sin(a) * ((height - next_h) / height) << " " << next_h << " " << radius * cos(a) * ((height - next_h) / height) << "\n";
             ss << radius * sin(next_a) * ((height - h) / height) << " " << h << " " << radius * cos(next_a) * ((height - h) / height) << "\n";
@@ -237,13 +233,13 @@ int main(int argc, char* argv[]){
     }
     // Preocupação em ver se todos os parametros foram passados
     switch (fig.at(0)) {   // buscar primeira letra
-        case 'p': {                                   
+        case 'p': {
             if(argc < 3){
                 cout << "\nError! Invalid number of arguments.\n";
                 exit(1);
             }
-            ss >> fname; //para ir buscar o nome que foi atribuido ao ficheiro  
-            res = gen_Plane(PLANE_HEIGHT);
+            ss >> fname; //para ir buscar o nome que foi atribuido ao ficheiro
+            res = gen_Plane(PLANE_WIDTH);
         break;
         }
         case 'b': {
@@ -280,7 +276,7 @@ int main(int argc, char* argv[]){
             int slices; ss >> slices;
             int stacks; ss >> stacks;
             ss >> fname;
-            res = gen_Cone(radius,height,slices,stacks);          
+            res = gen_Cone(radius,height,slices,stacks);
         break;
         }
         default:{
