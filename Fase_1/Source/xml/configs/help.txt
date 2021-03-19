@@ -1,0 +1,25 @@
+/*Although they all have the same name (xmlconf), they represent different figures*/
+
+//Plane
+
+<scene>
+  <model file="plane.3d"/>
+</scene>
+
+//Box
+
+<scene>
+  <model file="box.3d"/>
+</scene>
+
+//Sphere
+
+<scene>
+  <model file="sphere.3d"/>
+</scene>
+
+//Cone
+
+<scene>
+  <model file="cone.3d"/>
+</scene>
