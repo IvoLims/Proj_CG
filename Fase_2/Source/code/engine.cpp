@@ -22,25 +22,66 @@
 using namespace std;
 using namespace tinyxml2;
 
-#define INIT_R 7
+#define INIT_R 180
 #define INIT_ALPHA M_PI/4
 #define INIT_BETA M_PI/4
-#define ALPHA_JUMP 0.05
-#define BETA_JUMP 0.04
+#define R_JUMP 4
+#define ALPHA_JUMP 0.1
+#define BETA_JUMP 0.08
+#define UNIT 15
+#define EARTH_SIZE 1.5
+#define EARTH_ORBIT_SPEED 6
 
+//Camera
 float mouse_x_init, mouse_y_init;
 float mouse_x_prev, mouse_y_prev;
-
 float px, py, pz, alpha, beta, r;
 
-//For Window
+//Window
 int window;
 
-//For FPS counter
+//FPS counter
 int timebase;
 float frame;
 
+//VBO
 GLuint vertices, verticeCount;
+
+//Rotations
+float mercury_angle = 0;
+float venus_angle = 0;
+float earth_angle = 0;
+float mars_angle = 0;
+float asteroids_angle = 0;
+float jupiter_angle = 0;
+float saturn_angle = 0;
+float uranus_angle = 0;
+float neptune_angle = 0;
+
+float mercury_jump = EARTH_ORBIT_SPEED/0.238;
+float venus_jump = EARTH_ORBIT_SPEED/0.63;
+float earth_jump = EARTH_ORBIT_SPEED;
+float mars_jump = EARTH_ORBIT_SPEED/1.87;
+float asteroids_jump = 2*M_PI/3;
+float jupiter_jump = EARTH_ORBIT_SPEED/11.86;
+float saturn_jump = EARTH_ORBIT_SPEED/29.42;
+float uranus_jump = EARTH_ORBIT_SPEED/83.55;
+float neptune_jump = EARTH_ORBIT_SPEED/163.72;;
+
+void timer(int value) {
+	mercury_angle += mercury_jump;
+	venus_angle += venus_jump;
+	earth_angle += earth_jump;
+	mars_angle += mars_jump;
+	asteroids_angle += asteroids_jump;
+	jupiter_angle += jupiter_jump;
+	saturn_angle += saturn_jump;
+	uranus_angle += uranus_jump;
+	neptune_angle += neptune_jump;
+	
+	glutPostRedisplay();
+	glutTimerFunc(1, timer, 0);
+}
 
 void changeSize(int w, int h) {
 
@@ -72,16 +113,16 @@ void drawAxis() {
 	glBegin(GL_LINES);
 	// X axis in Red
 	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex3f(100.0f, 0.0f, 0.0f);
-	glVertex3f(-100.0f, 0.0f, 0.0f);
+	glVertex3f(1000.0f, 0.0f, 0.0f);
+	glVertex3f(-1000.0f, 0.0f, 0.0f);
 	// Y Axis in Green
 	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex3f(0.0f, 100.0f, 0.0f);
-	glVertex3f(0.0f, -100.0f, 0.0f);
+	glVertex3f(0.0f, 1000.0f, 0.0f);
+	glVertex3f(0.0f, -1000.0f, 0.0f);
 	// Z Axis in Blue
 	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex3f(0.0f, 0.0f, 100.0f);
-	glVertex3f(0.0f, 0.0f, -100.0f);
+	glVertex3f(0.0f, 0.0f, 1000.0f);
+	glVertex3f(0.0f, 0.0f, -1000.0f);
 	glEnd();
 }
 
@@ -126,8 +167,172 @@ void draw() {
 		GL_STATIC_DRAW); //indicativo da utilização (estático e para desenho)
 }
 
+void drawSphere(float radius, int slices, int stacks) {
+	float a = 0;
+	float b = 0;
+	float a_interval = 2 * M_PI / slices;
+	float b_interval = M_PI / stacks;
+	float next_a, next_b;
+
+	for (; a < 2 * M_PI; a += a_interval) {
+		for (b = -M_PI / 2; b < M_PI / 2; b += b_interval) {
+			next_a = a + a_interval;
+			next_b = b + b_interval;
+			if (next_a > 2 * M_PI) {
+				next_a = 2 * M_PI;
+			}
+			if (next_b > M_PI / 2) {
+				next_b = M_PI / 2;
+			}
+			glBegin(GL_TRIANGLES);
+			//Squares			
+			glVertex3f(radius * cos(next_b) * sin(next_a), radius * sin(next_b), radius * cos(next_b) * cos(next_a));
+			glVertex3f(radius * cos(next_b) * sin(a), radius * sin(next_b), radius * cos(next_b) * cos(a));
+			glVertex3f(radius * cos(b) * sin(next_a), radius * sin(b), radius * cos(b) * cos(next_a));
+
+			glVertex3f(radius * cos(b) * sin(next_a), radius * sin(b), radius * cos(b) * cos(next_a));
+			glVertex3f(radius * cos(next_b) * sin(a), radius * sin(next_b), radius * cos(next_b) * cos(a));
+			glVertex3f(radius * cos(b) * sin(a), radius * sin(b), radius * cos(b) * cos(a));
+			glEnd();
+
+		}
+	}
+}
+void drawSun() {
+	glColor3f(1, 0.8, 0);
+	drawSphere(2.5*EARTH_SIZE, 50, 50);
+}
+
+void drawMercury() {	
+	int dist = 0.4*UNIT;
+	glColor3f(0.3, 0.3, 0.3);
+	glPushMatrix();
+	glRotatef(mercury_angle, 0, 1, 0);
+	glTranslatef(dist, 0, 0);
+	drawSphere(EARTH_SIZE*1/3, 50, 50);
+	glPopMatrix();
+	//glRotatef();
+}
+
+void drawVenus() {
+	int dist = 0.7*UNIT;
+	glColor3f(0.73, 0.714, 0.667);
+	glPushMatrix();
+	glRotatef(venus_angle, 0, 1, 0);
+	glTranslatef(dist, 0, 0);
+	drawSphere(0.9*EARTH_SIZE, 50, 50);
+	glPopMatrix();
+	//glRotatef();
+}
+
+void drawEarth() {
+	int dist = 1*UNIT;
+	glPushMatrix();
+	glRotatef(earth_angle, 0, 1, 0);
+	glTranslatef(dist, 0, 0);
+	glColor3f(0.269, 0.507, 0.776);
+	drawSphere(EARTH_SIZE, 50, 50);
+	glPopMatrix();
+	//glRotatef();
+}
+
+void drawMars() {
+	int dist = 1.5*UNIT;
+	glPushMatrix();
+	glRotatef(mars_angle, 0, 1, 0);
+	glTranslatef(dist, 0, 0);
+	glColor3f(0.52, 0.26, 0.089);
+	drawSphere(EARTH_SIZE/2, 50, 50);
+	glPopMatrix();
+	//glRotatef();
+}
+
+void drawAsteroidBelt(float speed) {
+	int dist1 = 2.3*UNIT;
+	int dist2 = 3.3*UNIT;
+	int x, z, d;
+	float c;
+	for (float a = 0; a < 2 * M_PI; a+=M_PI/300) {
+		d = (rand() % (dist2-dist1)) + dist1;
+		x = d*sin(a);
+		z = d*cos(a);
+		c = rand() % 1;
+		glColor3f(0.55, 0.5, 0.51);
+		glPushMatrix();
+		glRotatef(speed * asteroids_angle, 0, 1, 0);
+		glTranslatef(x, 0, z);		
+		drawSphere(EARTH_SIZE*0.1, 3, 3);
+		glPopMatrix();
+	}
+}
+
+void drawJupiter() {
+	int dist = 5.2 * UNIT;
+	glPushMatrix();
+	glRotatef(jupiter_angle, 0, 1, 0);
+	glTranslatef(dist, 0, 0);
+	glColor3f(0.62, 0.6, 0.49);
+	drawSphere(2* EARTH_SIZE, 50, 50);
+	glPopMatrix();
+	//glRotatef();
+}
+
+void drawRing(float radius, int slices, int stacks) {
+	float interval = 2 * M_PI / slices;
+	float next_a;
+
+	for (float a = 0; a < 2 * M_PI; a += interval) {
+		next_a = a + interval;
+		if (next_a > 2 * M_PI) {
+			next_a = 2 * M_PI;
+		}
+		glBegin(GL_TRIANGLES);
+		glVertex3f(0.0f, 0, 0.0f);
+		glVertex3f(radius * sin(next_a), 0, radius * cos(next_a));
+		glVertex3f(radius * sin(a), 0, radius * cos(a));
+
+		glVertex3f(0.0f, 0, 0.0f);
+		glVertex3f(radius * sin(a), 0, radius * cos(a));
+		glVertex3f(radius * sin(next_a), 0, radius * cos(next_a));		
+		glEnd();
+	}
+}
+void drawSaturn() {
+	int dist = 9.2 * UNIT;
+	glPushMatrix();
+	glRotatef(saturn_angle, 0, 1, 0);
+	glTranslatef(dist, 0, 0);
+	glColor3f(0.52, 0.5, 0.39);
+	drawSphere(1.4* EARTH_SIZE, 50, 50);
+	glColor3f(0.42, 0.26, 0.189);
+	drawRing(1.4 * EARTH_SIZE * 2, 20, 20);
+	glPopMatrix();	
+}
+
+void drawUranus() {
+	int dist = 19.2 * UNIT;
+	glPushMatrix();
+	glRotatef(uranus_angle, 0, 1, 0);
+	glTranslatef(dist, 0, 0);
+	glColor3f(0.369, 0.607, 0.896);
+	drawSphere(1.2* EARTH_SIZE, 50, 50);
+	glPopMatrix();
+	//glRotatef();
+}
+
+void drawNeptune() {
+	int dist = 30.1 * UNIT;
+	glPushMatrix();
+	glRotatef(neptune_angle, 0, 1, 0);
+	glTranslatef(dist, 0, 0);
+	glColor3f(0.369, 0.607, 0.976);
+	drawSphere(1.2* EARTH_SIZE, 50, 50);
+	glPopMatrix();
+	//glRotatef();
+}
 
 void renderScene(void) {
+	srand(1);
 	// clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -138,14 +343,24 @@ void renderScene(void) {
 
 	// put the geometric transformations here
 
-	// put drawing instructions here
-
-	drawAxis();
-		
+	// put drawing instructions here	
+	drawSun();
+	drawMercury();
+	drawVenus();
+	drawEarth();
+	drawMars();
+	drawAsteroidBelt(1);
+	drawAsteroidBelt(1.7);
+	drawJupiter();
+	drawSaturn();
+	drawUranus();
+	drawNeptune();
+	/*
 	glBindBuffer(GL_ARRAY_BUFFER, vertices);
 	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glDrawArrays(GL_TRIANGLES, 0, verticeCount);
-
+	*/
+	
 	//FPS counter
 	frame++;
 	int final_time = glutGet(GLUT_ELAPSED_TIME);
@@ -153,12 +368,12 @@ void renderScene(void) {
 	if (final_time - timebase > 1000) {
 		int fps = frame * 1000.0f / (final_time - timebase);
 		char title[(((sizeof fps) * CHAR_BIT) + 2) / 3 + 2];
-		sprintf(title, "FPS: %d", fps);
+		sprintf_s(title, "FPS: %d", fps);
 		glutSetWindowTitle(title);
 		timebase = final_time;
 		frame = 0;
 	}
-
+	
 	// End of frame
 	glutSwapBuffers();
 }
@@ -212,11 +427,11 @@ void keyboard_func(unsigned char c, int mouse_x, int mouse_y) {
 		break;
 	}
 	case 'w': {
-		r -= 0.2;
+		r -= R_JUMP;
 		break;
 	}
 	case 's': {
-		r += 0.2;
+		r += R_JUMP;
 		break;
 	}
 	default: {
@@ -232,6 +447,7 @@ int main(int argc, char** argv) {
 	beta = INIT_BETA;
 	r = INIT_R;
 
+	
 	// init GLUT and the window
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
@@ -240,15 +456,15 @@ int main(int argc, char** argv) {
 	window = glutCreateWindow("Window");
 
 	glewInit();
-	draw();
+	
 	// Required callback registry 
 	glutIdleFunc(renderScene);
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
-
+	
 	//FPS Counter
 	timebase = glutGet(GLUT_ELAPSED_TIME);
-
+	
 	// put here the registration of the keyboard callbacks
 	glutMouseFunc(mouse);
 	glutMotionFunc(mouse_motion);
@@ -258,8 +474,9 @@ int main(int argc, char** argv) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT, GL_LINE);
-	
+	//glPolygonMode(GL_FRONT, GL_LINE);
+	glutTimerFunc(0, timer, 0);
+
 	// enter GLUT's main cycle
 	glutMainLoop();
 
