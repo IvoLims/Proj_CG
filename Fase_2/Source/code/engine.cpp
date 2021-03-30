@@ -126,47 +126,78 @@ void drawAxis() {
 	glEnd();
 }
 
-void draw() {
+void readXML_aux(XMLNode* node){
+	string value = node->Value();
+	XMLElement* children = node->ToElement();
+	if (strcmp(value.c_str(), "group") == 0) {
+	}
+	else if (strcmp(value.c_str(), "translate") == 0) {
+		int xt = children->DoubleAttribute("X");
+		int yt = children->DoubleAttribute("Y");
+		int zt = children->DoubleAttribute("Z");
+		cout << "X = " << xt << " Y = " << yt << " Z = " << zt << "\n";
+	}
+	else if (strcmp(value.c_str(), "rotate") == 0) {
+		int angler = children->DoubleAttribute("angle");
+		int xr = children->DoubleAttribute("axisX");
+		int yr = children->DoubleAttribute("axisY");
+		int zr = children->DoubleAttribute("axisZ");
+		cout << "angulo = " << angler << " X = " << xr << " Y = " << yr << " Z = " << zr;
+	}
+	else if (strcmp(value.c_str(), "scale") == 0) {
+		int xs = children->DoubleAttribute("X");
+		int ys = children->DoubleAttribute("Y");
+		int zs = children->DoubleAttribute("Z");
+		cout << "X = " << xs << " Y = " << ys << " Z = " << zs;
+	}
+	else if (strcmp(value.c_str(), "models") == 0) {
+		/*for (XMLElement* child = children->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()) {
+			string ch; ifstream file; vector<float> v; int size;
+			file.open(child->Attribute("file"), ios::in);
+			if (!file) {
+				cout << "There isn't one attribute 'file' in the XML file" << endl;
+				return;
+			}
+			file >> ch;
+			size = stoi(ch);
+			for (int i = 0; !file.eof(); i++) {
+				file >> ch;
+				v.push_back(stof(ch));
+				if (file.eof()) break;
+			}
+			file.close();
+
+			verticeCount = size * 3;
+			glGenBuffers(1, &vertices);
+			glBindBuffer(GL_ARRAY_BUFFER, vertices);
+			glBufferData(
+				GL_ARRAY_BUFFER, //tipo do buffer, só é relevante na altura do desenho
+				sizeof(float) * v.size(), //tamanho do vector em bytes
+				v.data(), //os dados do array associado ao vector
+				GL_STATIC_DRAW); //indicativo da utilização (estático e para desenho)
+		}*/
+	}
+	if (node->FirstChildElement() != nullptr) {
+		readXML_aux(node->FirstChildElement());
+	}	
+	if (node->NextSiblingElement() != nullptr){
+		readXML_aux(node->NextSiblingElement());
+	}
+}
+void readXML() {
+	string value;
 	XMLDocument doc;
 	XMLError load = doc.LoadFile("xmlconf.xml");
 	if (load != XML_SUCCESS) {
 		cout << "Error in XML file\n" << endl;
 		return;
 	}
-	XMLNode* pRoot = doc.FirstChildElement("scene");
-	if (pRoot == nullptr) return;
-
-	string ch;
-	ifstream file;
-	vector<float> v;
-	int size;
-	const char* title = doc.FirstChildElement("scene")->FirstChildElement("model")->Attribute("file");
-
-	file.open(title, ios::in);
-	if (!file) {
-		cout << "No such file" << endl;
-		return;
-	}
-	file >> ch;
-	size = stoi(ch);
-
-	for (int i = 0; !file.eof(); i++) {
-		file >> ch;
-		v.push_back(stof(ch));
-		if (file.eof()) break;
-	}
-	file.close();
-
-	verticeCount = size * 3;
-	glGenBuffers(1, &vertices);
-	glBindBuffer(GL_ARRAY_BUFFER, vertices);
-	glBufferData(
-		GL_ARRAY_BUFFER, //tipo do buffer, só é relevante na altura do desenho
-		sizeof(float) * v.size(), //tamanho do vector em bytes
-		v.data(), //os dados do array associado ao vector
-		GL_STATIC_DRAW); //indicativo da utilização (estático e para desenho)
+	XMLNode* node = doc.FirstChildElement("scene");
+	if (node == nullptr) return;
+	readXML_aux(node);
 }
 
+/*
 void drawSphere(float radius, int slices, int stacks) {
 	float a = 0;
 	float b = 0;
@@ -185,7 +216,7 @@ void drawSphere(float radius, int slices, int stacks) {
 				next_b = M_PI / 2;
 			}
 			glBegin(GL_TRIANGLES);
-			//Squares			
+			//Squares
 			glVertex3f(radius * cos(next_b) * sin(next_a), radius * sin(next_b), radius * cos(next_b) * cos(next_a));
 			glVertex3f(radius * cos(next_b) * sin(a), radius * sin(next_b), radius * cos(next_b) * cos(a));
 			glVertex3f(radius * cos(b) * sin(next_a), radius * sin(b), radius * cos(b) * cos(next_a));
@@ -330,7 +361,7 @@ void drawNeptune() {
 	glPopMatrix();
 	//glRotatef();
 }
-
+*/
 void renderScene(void) {
 	srand(1);
 	// clear buffers
@@ -344,6 +375,7 @@ void renderScene(void) {
 	// put the geometric transformations here
 
 	// put drawing instructions here	
+	/*
 	drawSun();
 	drawMercury();
 	drawVenus();
@@ -355,11 +387,11 @@ void renderScene(void) {
 	drawSaturn();
 	drawUranus();
 	drawNeptune();
-	/*
+	*/
 	glBindBuffer(GL_ARRAY_BUFFER, vertices);
 	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glDrawArrays(GL_TRIANGLES, 0, verticeCount);
-	*/
+
 
 	//FPS counter
 	frame++;
@@ -391,10 +423,10 @@ void mouse(int button, int state, int mouse_x, int mouse_y) {
 
 void mouse_motion(int mouse_x, int mouse_y) {
 	if (mouse_x > mouse_x_prev) {
-		alpha -= ALPHA_JUMP;
+		alpha += ALPHA_JUMP;
 	}
 	if (mouse_x < mouse_x_prev) {
-		alpha += ALPHA_JUMP;
+		alpha -= ALPHA_JUMP;
 	}
 	if (mouse_y > mouse_y_prev) {
 		if (beta < M_PI / 2 - BETA_JUMP) {
@@ -455,8 +487,10 @@ int main(int argc, char** argv) {
 	glutInitWindowSize(800, 800);
 	window = glutCreateWindow("Window");
 
-	glewInit();
 
+	glewInit();
+	//getGroup();
+	readXML();
 	// Required callback registry 
 	glutIdleFunc(renderScene);
 	glutDisplayFunc(renderScene);
@@ -474,7 +508,7 @@ int main(int argc, char** argv) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	//glPolygonMode(GL_FRONT, GL_LINE);
+	glPolygonMode(GL_FRONT, GL_LINE);
 	glutTimerFunc(0, timer, 0);
 
 	// enter GLUT's main cycle
