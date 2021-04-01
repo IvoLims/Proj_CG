@@ -22,7 +22,7 @@
 using namespace std;
 using namespace tinyxml2;
 
-#define INIT_R 20
+#define INIT_R 180
 #define INIT_ALPHA M_PI/4
 #define INIT_BETA M_PI/4
 #define R_JUMP 4
@@ -46,7 +46,7 @@ float frame;
 
 //VBO
 GLuint vertices, verticeCount;
-vector<float> v;
+vector<float> v; 
 
 //Matrices
 struct MATRIX {
@@ -106,15 +106,18 @@ void drawAxis() {
 	glColor3f(0.4f, 0.5f, 1.0f);
 }
 
-void readXML_aux(XMLNode* node) {
+void readXML_aux(XMLNode* node){
 	string value = node->Value();
+	cout << value << "\n";
 	float angle, x, y, z;
 	string ch; ifstream file;
 	XMLElement* node_elem = node->ToElement();
 	if (strcmp(value.c_str(), "group") == 0) {
 		glPushMatrix();
+		cout << "PushMatrix\n";
 		readXML_aux(node->FirstChildElement());
 		glPopMatrix();
+		cout << "PopMatrix\n";
 	}
 	else if (strcmp(value.c_str(), "translate") == 0) {
 		x = node_elem->DoubleAttribute("X");
@@ -139,27 +142,27 @@ void readXML_aux(XMLNode* node) {
 		for (XMLElement* children = node_elem->FirstChildElement(); children != nullptr; children = children->NextSiblingElement()) {
 			int model_size;
 			MATRIX new_matrix;
-			new_matrix.beg = v.size() / 3;
+			new_matrix.beg = v.size()/3;
 			file.open(children->Attribute("file"));
 			if (!file) {
 				cout << "There isn't one attribute 'file' in the XML file" << endl;
 				continue;
 			}
-			file >> ch;
-			model_size = stoi(ch) * 3;
+			file >> ch;	
+			model_size = stoi(ch)*3;
 			for (file >> ch; !file.eof(); file >> ch) {
 				v.push_back(stof(ch));
 			}
 			file.close();
 			new_matrix.count = model_size;
-			glGetFloatv(GL_MODELVIEW_MATRIX, new_matrix.m);
+			glGetFloatv(GL_MODELVIEW_MATRIX, new_matrix.m);		
 			matrices.push_back(new_matrix);
 		}
-	}
-	if (node->FirstChildElement() != nullptr && strcmp(value.c_str(), "models") != 0 && strcmp(value.c_str(), "group") != 0) {
+	}	
+	if (node->FirstChildElement() != nullptr && strcmp(value.c_str(),"models") != 0 && strcmp(value.c_str(), "group") != 0) {
 		readXML_aux(node->FirstChildElement());
-	}
-	if (node->NextSiblingElement() != nullptr) {
+	}		
+	if (node->NextSiblingElement() != nullptr){
 		readXML_aux(node->NextSiblingElement());
 	}
 }
@@ -174,7 +177,7 @@ void readXML() {
 	}
 	XMLNode* node = doc.FirstChildElement("scene");
 	if (node == nullptr) return;
-	readXML_aux(node);
+	readXML_aux(node);		
 	glGenBuffers(1, &vertices);
 	glBindBuffer(GL_ARRAY_BUFFER, vertices);
 	glBufferData(
@@ -182,7 +185,6 @@ void readXML() {
 		sizeof(float) * v.size(), //tamanho do vector em bytes
 		v.data(), //os dados do array associado ao vector
 		GL_STATIC_DRAW); //indicativo da utilização (estático e para desenho)
-
 }
 
 void renderScene(void) {
@@ -202,7 +204,7 @@ void renderScene(void) {
 	glBindBuffer(GL_ARRAY_BUFFER, vertices);
 	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glColor3f(0.5, 0.5, 0.6);
-	for (int i = 0; i < matrices.size(); i++) {
+	for (int i = 0; i < matrices.size(); i++) {	
 		glPushMatrix();
 		glMultMatrixf(matrices[i].m);
 		glDrawArrays(GL_TRIANGLES, matrices[i].beg, matrices[i].count);
@@ -302,6 +304,7 @@ int main(int argc, char** argv) {
 
 
 	glewInit();
+	//getGroup();
 	readXML();
 
 	// Required callback registry 
@@ -321,7 +324,7 @@ int main(int argc, char** argv) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT, GL_LINE);
+	//glPolygonMode(GL_FRONT, GL_LINE);
 	//glutTimerFunc(0, timer, 0);
 
 	// enter GLUT's main cycle
