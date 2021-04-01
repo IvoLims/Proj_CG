@@ -46,7 +46,7 @@ float frame;
 
 //VBO
 GLuint vertices, verticeCount;
-vector<float> v; 
+vector<float> v;
 
 //Matrices
 struct MATRIX {
@@ -106,25 +106,21 @@ void drawAxis() {
 	glColor3f(0.4f, 0.5f, 1.0f);
 }
 
-void readXML_aux(XMLNode* node){
+void readXML_aux(XMLNode* node) {
 	string value = node->Value();
-	cout << value << "\n";
 	float angle, x, y, z;
 	string ch; ifstream file;
 	XMLElement* node_elem = node->ToElement();
 	if (strcmp(value.c_str(), "group") == 0) {
 		glPushMatrix();
-		cout << "PushMatrix\n";
 		readXML_aux(node->FirstChildElement());
 		glPopMatrix();
-		cout << "PopMatrix\n";
 	}
 	else if (strcmp(value.c_str(), "translate") == 0) {
 		x = node_elem->DoubleAttribute("X");
 		y = node_elem->DoubleAttribute("Y");
 		z = node_elem->DoubleAttribute("Z");
 		glTranslatef(x, y, z);
-		//cout << "X = " << xt << " Y = " << yt << " Z = " << zt << "\n";
 	}
 	else if (strcmp(value.c_str(), "rotate") == 0) {
 		angle = node_elem->DoubleAttribute("angle");
@@ -132,40 +128,38 @@ void readXML_aux(XMLNode* node){
 		y = node_elem->DoubleAttribute("axisY");
 		z = node_elem->DoubleAttribute("axisZ");
 		glRotatef(angle, x, y, z);
-		//cout << "angulo = " << angler << " X = " << xr << " Y = " << yr << " Z = " << zr;
 	}
 	else if (strcmp(value.c_str(), "scale") == 0) {
 		x = node_elem->DoubleAttribute("X");
 		y = node_elem->DoubleAttribute("Y");
 		z = node_elem->DoubleAttribute("Z");
 		glScalef(x, y, z);
-		//cout << "X = " << xs << " Y = " << ys << " Z = " << zs;
 	}
 	else if (strcmp(value.c_str(), "models") == 0) {
 		for (XMLElement* children = node_elem->FirstChildElement(); children != nullptr; children = children->NextSiblingElement()) {
 			int model_size;
 			MATRIX new_matrix;
-			new_matrix.beg = v.size()/3;
+			new_matrix.beg = v.size() / 3;
 			file.open(children->Attribute("file"));
 			if (!file) {
 				cout << "There isn't one attribute 'file' in the XML file" << endl;
 				continue;
 			}
-			file >> ch;	
-			model_size = stoi(ch)*3;
+			file >> ch;
+			model_size = stoi(ch) * 3;
 			for (file >> ch; !file.eof(); file >> ch) {
 				v.push_back(stof(ch));
 			}
 			file.close();
 			new_matrix.count = model_size;
-			glGetFloatv(GL_MODELVIEW_MATRIX, new_matrix.m);		
+			glGetFloatv(GL_MODELVIEW_MATRIX, new_matrix.m);
 			matrices.push_back(new_matrix);
 		}
-	}	
-	if (node->FirstChildElement() != nullptr && strcmp(value.c_str(),"models") != 0 && strcmp(value.c_str(), "group") != 0) {
+	}
+	if (node->FirstChildElement() != nullptr && strcmp(value.c_str(), "models") != 0 && strcmp(value.c_str(), "group") != 0) {
 		readXML_aux(node->FirstChildElement());
-	}		
-	if (node->NextSiblingElement() != nullptr){
+	}
+	if (node->NextSiblingElement() != nullptr) {
 		readXML_aux(node->NextSiblingElement());
 	}
 }
@@ -180,7 +174,7 @@ void readXML() {
 	}
 	XMLNode* node = doc.FirstChildElement("scene");
 	if (node == nullptr) return;
-	readXML_aux(node);		
+	readXML_aux(node);
 	glGenBuffers(1, &vertices);
 	glBindBuffer(GL_ARRAY_BUFFER, vertices);
 	glBufferData(
@@ -188,7 +182,7 @@ void readXML() {
 		sizeof(float) * v.size(), //tamanho do vector em bytes
 		v.data(), //os dados do array associado ao vector
 		GL_STATIC_DRAW); //indicativo da utilização (estático e para desenho)
-	
+
 }
 
 void renderScene(void) {
@@ -208,12 +202,11 @@ void renderScene(void) {
 	glBindBuffer(GL_ARRAY_BUFFER, vertices);
 	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glColor3f(0.5, 0.5, 0.6);
-	for (int i = 0; i < matrices.size(); i++) {	
+	for (int i = 0; i < matrices.size(); i++) {
 		glPushMatrix();
 		glMultMatrixf(matrices[i].m);
 		glDrawArrays(GL_TRIANGLES, matrices[i].beg, matrices[i].count);
 		glPopMatrix();
-		cout << matrices[i].beg << " " << matrices[i].count << "\n";
 	}
 	//FPS counter
 	frame++;
@@ -309,11 +302,10 @@ int main(int argc, char** argv) {
 
 
 	glewInit();
-	//getGroup();
 	readXML();
 
 	// Required callback registry 
-	//glutIdleFunc(renderScene);
+	glutIdleFunc(renderScene);
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
 
