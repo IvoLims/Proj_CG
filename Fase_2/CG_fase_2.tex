@@ -40,13 +40,6 @@
   title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
 }
 
-\lstdefinestyle{calculations}{
-  breaklines=true,
-  basicstyle=\footnotesize,
-  extendedchars=true,
-  keepspaces=true  
-}
-
 \title{Computação Gráfica (3º ano de Curso)\\
        \textbf{Fase 2}\\ Relatório de Desenvolvimento
        } %Titulo do documento
@@ -72,9 +65,37 @@
 
 Nesta segunda fase tivemos como principal objetivo a criação de um cenário hierárquico, onde uma certa cena (no nosso caso um modelo do Sistema Solar) será definido a partir de uma árvore onde cada nodo irá conter um conjunto de transformações geométricas (translações,rotações e escalas). Cada nodo terá vários nodos filhos.
 
-A única parte que sofreu alterações foi o \emph{xml} para que fosse possível processar os novos elementos e torna-se capaz de ler um ficheiro de configuração na \emph{engine}.
+A única parte que sofreu alterações foi a \emph{engine} para que fosse possível processar os novos elementos propostos pela segunda fase do trabalho.
 
 \chapter{Atualização da \emph{engine}}
+\section{Substituição da \emph{void draw()}}
+
+Visto que temos uma nova estrutura do ficheiro \emph{xml} foi necessário repensar e reestruturar a função de carregamento do ficheiro de configuração (no nosso caso a \emph{void draw()}). Utilizamos primordialmente o seguinte exemplo:
+
+\begin{lstlisting}
+<scene>
+      <group>
+            <translate X="5" Y="0" Z="2" />
+            <rotate angle="45" axisX="0" axisY="1" axisZ="0" />
+            <models>
+                  <model file="sphere.3d" />
+            </models>
+      </group>
+</scene>
+\end{lstlisting}
+
+Tendo este exemplo em mente e outros que foram disponibilizados no enunciado do trabalho, percebemos que a \emph{scene} tem um ou vários "filhos" \emph{group} e por sua vez cada \emph{group} possui um conjunto de transformações aplicáveis a todos os elementos dentro do nodo \emph{models}.
+
+Depois desta breve análise chegamos a uma concluão que foi partir e dividir as funcionalidades do método feito na 1º fase, o mesmo originou uma \emph{readXML} e uma \emph{readXMLaux}.
+
+\section{Função \emph{readXML}}
+
+blah.
+
+\section{Função \emph{void readXMLaux}}
+
+blah.
+
 \section{Ficheiro de configuração xml para o Sistema Solar}
 Para o desenvolvimento do nosso modelo do Sistema Solar consideramos que o mesmo apenas se trata de uma composição de várias esferas na configuração do ficheiro  \emph{xml}.
 
