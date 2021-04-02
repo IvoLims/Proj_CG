@@ -49,8 +49,7 @@
         </group>
         <!-- Saturn -->
         <group>
-        	<translate X = "138" />
-        	<rotate angle="27"  axisX="0" axisY="1" axisZ="0" />
+            <translate X = "138" />
             <scale X="1.05" Y="1.05" Z="1.05"/>
             <models>
                 <model file="sphere.3d" />
@@ -58,7 +57,8 @@
         </group>
         <!-- Saturn Ring-->
         <group>
-        	<translate X = "138" />
+            <translate X = "138" />
+	    <rotate angle="27"  axisX="0" axisY="1" axisZ="0" />
             <scale X="1.5" Y="1.5" Z="1.5"/>
             <models>
                 <model file="ring.3d" />
