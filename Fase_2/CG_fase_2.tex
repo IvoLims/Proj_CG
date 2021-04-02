@@ -63,9 +63,9 @@
 
 \chapter{Introdução}
 
-Nesta segunda fase tivemos como principal objetivo a criação de um cenário hierárquico, onde uma certa cena (no nosso caso um modelo do Sistema Solar) será definido a partir de uma árvore onde cada nodo irá conter um conjunto de transformações geométricas (translações,rotações e escalas). Cada nodo terá vários nodos filhos.
+Nesta segunda fase tivemos como principal objetivo a criação de um cenário hierárquico, onde uma certa cena (no nosso caso um modelo do Sistema Solar) será definido a partir de uma árvore onde cada nodo irá conter um conjunto de transformações geométricas (translações, rotações e escalas) assim como a figura (ou figuras) a ser desenhada. Cada nodo poderá ter vários nodos filhos.
 
-A única parte que sofreu alterações foi a \emph{engine} para que fosse possível processar os novos elementos propostos pela segunda fase do trabalho.
+A única parte que sofreu alterações foi a \emph{engine} para que fosse possível processar os novos elementos propostos para a segunda fase do trabalho.
 
 \chapter{Atualização da \emph{engine}}
 \section{Substituição da \emph{void draw()}}
@@ -99,17 +99,13 @@ blah.
 \section{Ficheiro de configuração xml para o Sistema Solar}
 Para o desenvolvimento do nosso modelo do Sistema Solar consideramos que o mesmo apenas se trata de uma composição de várias esferas na configuração do ficheiro  \emph{xml}.
 
-Inicialmente, a esfera que representa um planeta foi gerada com raio 1 através do programa \emph{generator} desenvolvido na 1º Fase.
-
-Embora achamos que é óbvio o porquê da utilização de uma escala aproximada e não da escala real sentimos a necessidade de frizar que a utilização da mesma  tornar-se-ia utópica bem como fatigante, para a visualização de todos os planetas no ecrã.
-
-Relativamente aos satélites naturais dos planetas optamos por apresentar numa fase mais avançada.
+Inicialmente, a esfera que representa um planeta foi gerada com raio 1 através do programa \emph{generator} desenvolvido na 1º Fase. Cada planeta é uma série de transformações geométricas aplicadas a essa esfera. As dimensões dos planetas não estão em escala, mas as distâncias estão.
 
 \chapter{Conclusão}
 
 Graças a esta segunda fase o nosso projeto ganhou uma maior capacidade de processamento através dos ficheiros de configuração do \emph{xml} .
-As transformações pedidas (translações,rotações e escalas) já são possíveis,  o que atribuiu ao nossa modelo de Sistema Solar um atributo visual mais rico e concedeu-lhe vida.
+A leitura de transformações (translações, rotações e escalas) já são possíveis, o que possibilitou desenhar algo como um modelo do Sistema Solar.
 
-Concluímos assim que esta fase foi fulcral para a nossa maquete e que embora este estágio ainda seja muito prematura este sistema será de grande importância para as próximas fases, logo o nosso propósito nesta etapa foi completado.
+Concluímos assim que esta fase foi fulcral para a nossa maquete e que embora este estágio ainda seja muito prematuro, este sistema será de grande importância para as próximas fases, logo o nosso propósito nesta etapa foi completado.
 
 \end{document}
