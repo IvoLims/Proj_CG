@@ -46,15 +46,15 @@ float frame;
 
 //VBO
 GLuint vertices, verticeCount;
-vector<float> v; 
+vector<float> v;
 
-//Matrices
-struct MATRIX {
-	int beg; //inicio no vbo
+//Figures
+struct FIGURE {
+	int beg;
 	int count;
 	GLfloat m[16];
 };
-vector<MATRIX> matrices;
+vector<FIGURE> figures;
 
 void timer(int value) {
 
@@ -69,7 +69,7 @@ void changeSize(int w, int h) {
 	if (h == 0)
 		h = 1;
 
-	// compute window's aspect ratio 
+	// compute window's aspect ratio
 	float ratio = w * 1.0 / h;
 
 	// Set the projection matrix as current
@@ -106,7 +106,7 @@ void drawAxis() {
 	glColor3f(0.4f, 0.5f, 1.0f);
 }
 
-void readXML_aux(XMLNode* node){
+void readXML_aux(XMLNode* node) {
 	string value = node->Value();
 	cout << value << "\n";
 	float angle, x, y, z;
@@ -141,28 +141,25 @@ void readXML_aux(XMLNode* node){
 	else if (strcmp(value.c_str(), "models") == 0) {
 		for (XMLElement* children = node_elem->FirstChildElement(); children != nullptr; children = children->NextSiblingElement()) {
 			int model_size;
-			MATRIX new_matrix;
-			new_matrix.beg = v.size()/3;
+			FIGURE new_figure;
+			new_figure.beg = v.size() / 3;
 			file.open(children->Attribute("file"));
 			if (!file) {
 				cout << "There isn't one attribute 'file' in the XML file" << endl;
 				continue;
 			}
-			file >> ch;	
-			model_size = stoi(ch)*3;
+			file >> ch;
+			model_size = stoi(ch) * 3;
 			for (file >> ch; !file.eof(); file >> ch) {
 				v.push_back(stof(ch));
 			}
 			file.close();
-			new_matrix.count = model_size;
-			glGetFloatv(GL_MODELVIEW_MATRIX, new_matrix.m);		
-			matrices.push_back(new_matrix);
+			new_figure.count = model_size;
+			glGetFloatv(GL_MODELVIEW_MATRIX, new_figure.m);
+			figures.push_back(new_figure);
 		}
-	}	
-	if (node->FirstChildElement() != nullptr && strcmp(value.c_str(),"models") != 0 && strcmp(value.c_str(), "group") != 0) {
-		readXML_aux(node->FirstChildElement());
-	}		
-	if (node->NextSiblingElement() != nullptr){
+	}
+	if (node->NextSiblingElement() != nullptr) {
 		readXML_aux(node->NextSiblingElement());
 	}
 }
@@ -177,14 +174,17 @@ void readXML() {
 	}
 	XMLNode* node = doc.FirstChildElement("scene");
 	if (node == nullptr) return;
-	readXML_aux(node);		
+	if (node->FirstChildElement() != nullptr) {
+		node = node->FirstChildElement();
+	}
+	readXML_aux(node);
 	glGenBuffers(1, &vertices);
 	glBindBuffer(GL_ARRAY_BUFFER, vertices);
 	glBufferData(
-		GL_ARRAY_BUFFER, //tipo do buffer, só é relevante na altura do desenho
-		sizeof(float) * v.size(), //tamanho do vector em bytes
-		v.data(), //os dados do array associado ao vector
-		GL_STATIC_DRAW); //indicativo da utilização (estático e para desenho)
+		GL_ARRAY_BUFFER,
+		sizeof(float) * v.size(),
+		v.data(),
+		GL_STATIC_DRAW);
 }
 
 void renderScene(void) {
@@ -199,15 +199,15 @@ void renderScene(void) {
 
 	// put the geometric transformations here
 
-	// put drawing instructions here	
+	// put drawing instructions here
 	drawAxis();
 	glBindBuffer(GL_ARRAY_BUFFER, vertices);
 	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glColor3f(0.5, 0.5, 0.6);
-	for (int i = 0; i < matrices.size(); i++) {	
+	for (int i = 0; i < figures.size(); i++) {
 		glPushMatrix();
-		glMultMatrixf(matrices[i].m);
-		glDrawArrays(GL_TRIANGLES, matrices[i].beg, matrices[i].count);
+		glMultMatrixf(figures[i].m);
+		glDrawArrays(GL_TRIANGLES, figures[i].beg, figures[i].count);
 		glPopMatrix();
 	}
 	//FPS counter
@@ -307,7 +307,7 @@ int main(int argc, char** argv) {
 	//getGroup();
 	readXML();
 
-	// Required callback registry 
+	// Required callback registry
 	glutIdleFunc(renderScene);
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
