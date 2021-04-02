@@ -50,36 +50,34 @@
         <!-- Saturn -->
         <group>
             <translate X = "138" />
+	    	<rotate angle="27"  axisX="1" axisY="0" axisZ="0" />
             <scale X="1.05" Y="1.05" Z="1.05"/>
             <models>
                 <model file="sphere.3d" />
             </models>
-        </group>
-        <!-- Saturn Ring-->
-        <group>
-            <translate X = "138" />
-	    <rotate angle="27"  axisX="1" axisY="0" axisZ="0" />
-            <scale X="1.5" Y="1.5" Z="1.5"/>
-            <models>
-                <model file="ring.3d" />
-            </models>
+        	<!-- Saturn Ring-->
+        	<group>
+            	<scale X="1.5" Y="1.5" Z="1.5"/>
+            	<models>
+                	<model file="ring.3d" />
+            	</models>
+       		</group>
         </group>
         <!-- Uranus -->
         <group>
             <translate X = "288" />
+            <rotate angle="98"  axisX="1" axisY="0" axisZ="0" />
             <scale X="0.9" Y="0.9" Z="0.9"/>
             <models>
                 <model file="sphere.3d" />
             </models>
-        </group>
-        <!-- Uranus Ring-->
-        <group>
-            <translate X = "288" />
-            <rotate angle="98"  axisX="1" axisY="0" axisZ="0" />
-            <scale X="1.9" Y="1.9" Z="1.9"/>
-            <models>
-                <model file="ring.3d" />
-            </models>
+        	<!-- Uranus Ring-->
+        	<group>
+            	<scale X="1.9" Y="1.9" Z="1.9"/>
+            	<models>
+                	<model file="ring.3d" />
+            	</models>
+        	</group>
         </group>
         <!-- Neptune -->
         <group>
