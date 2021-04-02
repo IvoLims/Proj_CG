@@ -108,16 +108,13 @@ void drawAxis() {
 
 void readXML_aux(XMLNode* node) {
 	string value = node->Value();
-	cout << value << "\n";
 	float angle, x, y, z;
 	string ch; ifstream file;
 	XMLElement* node_elem = node->ToElement();
 	if (strcmp(value.c_str(), "group") == 0) {
 		glPushMatrix();
-		cout << "PushMatrix\n";
 		readXML_aux(node->FirstChildElement());
 		glPopMatrix();
-		cout << "PopMatrix\n";
 	}
 	else if (strcmp(value.c_str(), "translate") == 0) {
 		x = node_elem->DoubleAttribute("X");
@@ -304,7 +301,6 @@ int main(int argc, char** argv) {
 
 
 	glewInit();
-	//getGroup();
 	readXML();
 
 	// Required callback registry
@@ -324,7 +320,7 @@ int main(int argc, char** argv) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	//glPolygonMode(GL_FRONT, GL_LINE);
+	glPolygonMode(GL_FRONT, GL_LINE);
 	//glutTimerFunc(0, timer, 0);
 
 	// enter GLUT's main cycle
