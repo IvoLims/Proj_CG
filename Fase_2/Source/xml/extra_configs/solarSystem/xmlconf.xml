@@ -55,7 +55,6 @@
                 <model file="sphere.3d" />
    	    </model>
         	<group>
-            		<translate X = "138" />
 	    		<rotate angle="27"  axisX="0" axisY="1" axisZ="0" />
             		<scale X="1.5" Y="1.5" Z="1.5"/>
             		<models>
@@ -71,7 +70,6 @@
                 <model file="sphere.3d" />
             </models>
         	<group>
-            		<translate X = "288" />
             		<rotate angle="98"  axisX="0" axisY="1" axisZ="0" />
             		<scale X="1.9" Y="1.9" Z="1.9"/>
             		<models>
