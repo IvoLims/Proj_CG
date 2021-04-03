@@ -20,14 +20,39 @@
   breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
   breaklines=true,                 % sets automatic line breaking
   captionpos=b,                    % sets the caption-position to bottom
-  commentstyle=\color{white},      % comment style
+  commentstyle=\color{white},    % comment style
   deletekeywords={...},            % if you want to delete keywords from the given language
   escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
   extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
   firstnumber=1000,                % start line enumeration with line 1
   keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
   keywordstyle=\color{blue},       % keyword style
-  language=C++,                    % the language of the code
+  language=C++,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\lstdefinestyle{xml}{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{white},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1000,                % start line enumeration with line 1
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=XML,                 % the language of the code
   morekeywords={*,...},            % if you want to add more keywords to the set
   numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
   rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
@@ -70,7 +95,7 @@ A única parte que sofreu alterações foi a \emph{engine} para que fosse possí
 \chapter{Atualização da \emph{engine}}
 Visto que temos uma nova estrutura do ficheiro \emph{xml} foi necessário repensar e reestruturar a função de carregamento do ficheiro de configuração (no nosso caso a \emph{draw()}). Utilizamos primordialmente o seguinte exemplo:
 
-\begin{lstlisting}
+\begin{lstlisting}[style = xml]
 <scene>
       <group>
             <translate X="5" Y="0" Z="2" />
@@ -87,6 +112,14 @@ Tendo este exemplo em mente e outros que foram disponibilizados no enunciado do 
 Depois desta breve análise chegamos à conclusão que necessitariamos de extender as funcionalidades da função escrita na 1º fase, o mesmo originou uma \emph{readXML} e uma {$readXML\_aux$}.
 
 Foi criada uma struct \emph{FIGURE} para guardar o primeiro vértice e o número de vértices de uma determinada figura, para ser identificável no VBO, assim como a matriz de transformação associada. 
+
+\begin{lstlisting}[style = code]
+struct FIGURE {
+	int beg;
+	int count;
+	GLfloat m[16];
+};
+\end{lstlisting}
 Foi também criado um \emph{vector FIGURE figures} para que fosse possível guardar em memória as informações lidas a partir do ficheiro xml.
 
 \section{Funções \emph{readXML e {$readXML\_aux$} }}
