@@ -1,0 +1,162 @@
+
+\documentclass[11pt,a4paper]{report}
+
+\usepackage[portuges]{babel}
+\usepackage[utf8]{inputenc} % define o encoding usado texto fonte (input)--usual "utf8" ou "latin1
+\usepackage{graphicx} %permite incluir graficos, tabelas, figuras
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{multicol}
+\usepackage{indentfirst}
+
+\definecolor{myblue}{rgb}{0.2,0.2,0.8}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstdefinestyle{code}{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{white},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1000,                % start line enumeration with line 1
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=C++,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\lstdefinestyle{xml}{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{white},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1000,                % start line enumeration with line 1
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=XML,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\title{Computação Gráfica (3º ano de Curso)\\
+       \textbf{Fase 2}\\ Relatório de Desenvolvimento
+       } %Titulo do documento
+%\title{Um Exemplo de Artigo em \LaTeX}
+\author{Diogo Fernandes\\ (A87968) \and Luís Guimarães\\ (A87947)
+         \and Ivo Lima\\ (A90214)
+       } %autores do documento
+\date{\today} %data
+
+\begin{document}
+	\begin{minipage}{0.9\linewidth}
+        \centering
+		\includegraphics[width=0.4\textwidth]{um.jpeg}\par\vspace{1cm}
+		{\scshape\LARGE Universidade do Minho} \par
+		\vspace{0.6cm}
+		{\scshape\Large Licenciatura em Ciências da Computação} \par
+		\maketitle
+	\end{minipage}
+
+\tableofcontents % insere Indice
+
+\chapter{Introdução}
+
+Nesta segunda fase tivemos como principal objetivo a criação de um cenário hierárquico, onde uma certa cena (no nosso caso um modelo do Sistema Solar) será definido a partir de uma árvore onde cada nodo irá conter um conjunto de transformações geométricas (translações, rotações e escalas) assim como a figura (ou figuras) a ser desenhada. Cada nodo poderá ter vários nodos filhos.
+
+A única parte que sofreu alterações foi a \emph{engine} para que fosse possível processar os novos elementos propostos para a segunda fase do trabalho.
+
+\chapter{Atualização da \emph{engine}}
+Visto que temos uma nova estrutura do ficheiro \emph{xml} foi necessário repensar e reestruturar a função de carregamento do ficheiro de configuração (no nosso caso a \emph{draw()}). Utilizamos primordialmente o seguinte exemplo:
+
+\begin{lstlisting}[style = xml]
+<scene>
+      <group>
+            <translate X="5" Y="0" Z="2" />
+            <rotate angle="45" axisX="0" axisY="1" axisZ="0" />
+            <models>
+                  <model file="sphere.3d" />
+            </models>
+      </group>
+</scene>
+\end{lstlisting}
+
+Tendo este exemplo em mente e outros que foram disponibilizados no enunciado do trabalho, percebemos que a \emph{scene} tem um ou vários "filhos" \emph{group} e cada \emph{group} pode possuir um conjunto de transformações aplicáveis a todos os elementos dentro do nodo \emph{models}.
+
+Depois desta breve análise chegamos à conclusão que necessitariamos de extender as funcionalidades da função escrita na 1º fase, o mesmo originou uma \emph{readXML} e uma {$readXML\_aux$}.
+
+Foi criada uma struct \emph{FIGURE} para guardar o primeiro vértice e o número de vértices de uma determinada figura, para ser identificável no VBO, assim como a matriz de transformação associada. 
+
+\begin{lstlisting}[style = code]
+struct FIGURE {
+	int beg;
+	int count;
+	GLfloat m[16];
+};
+\end{lstlisting}
+Foi também criado um \emph{vector FIGURE figures} para que fosse possível guardar em memória as informações lidas a partir do ficheiro xml.
+
+\section{Funções \emph{readXML e {$readXML\_aux$} }}
+
+Estas funções tratam de ler o ficheiro xml. readXML começa por abrir o ficheiro e criar um XMLNode * que passa depois à função {$readXML\_aux$} no caso do primeiro nodo ser \emph{scene}. 
+
+Esta função vai ler esse nodo e realizar as instruções apropriadas, dependendo do que encontrar. 
+\begin{itemize}
+\item \emph{group}: é invocada \emph{glPushMatrix}, feita a travessia dos seus filhos e no final dessa travessia é invocada \emph{glPopMatrix}.
+\item \emph{models}: percorre os seus filhos e, para cada filho é criada uma Figure onde são guardados o vértice inicial (no VBO), o número de vértices e a matriz de transformação (baseadas no ficheiro xml) recorrendo à função \emph{glGetFloatv}. No final do seu preenchimento, cada FIGURE é adicionada ao \emph{vector FIGURE figures}.
+
+\item \emph{translate}: é invocada \emph{glTranslatef} passando como argumentos os valores lidos. 
+\item \emph{rotate}: é invocada \emph{glRotatef} passando como argumentos os valores lidos.
+\item \emph{scale}: é invocada \emph{glScalef} passando como argumentos os valores lidos.
+\end{itemize}
+A sua última instrução é invocar-se para o próximo irmão, se este existir. Esta função é, portanto, recursiva.
+
+\section{Render Scene}
+Esta função foi atualizada de forma a percorrer o \emph{vector FIGURE figures} e desenhar, a partir do VBO, cada figura com as respetivas transformações.
+\section{Ficheiro de configuração xml para o Sistema Solar}
+Para o desenvolvimento do nosso modelo do Sistema Solar considerámos que o mesmo se trata, essencialmente, de uma composição de esferas na configuração do ficheiro  \emph{xml}.
+
+Inicialmente, gerou-se uma única esfera com raio 1 através do programa \emph{generator} desenvolvido na 1º Fase. De seguida, cada planeta foi "construído" a partir dessa esfera aplicando-lhe uma série de transformações geométricas. 
+
+Apenas as dimensões dos planetas estão em escala assim como as suas distâncias.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{sistema_solar.png}\par\vspace{1cm}
+      \caption{Modelo do Sistema Solar}
+\end{figure}
+
+\chapter{Conclusão}
+
+Graças a esta segunda fase o nosso projeto ganhou uma maior capacidade de processamento através dos ficheiros de configuração do \emph{xml} .
+A leitura de transformações (translações, rotações e escalas) a partir do ficheiro de configuração já são possíveis, o que possibilitou desenhar algo como um modelo do Sistema Solar.
+
+Concluímos assim que esta fase foi fulcral para a nossa maquete e que embora este estágio ainda seja muito prematuro, este sistema será de grande importância para as próximas fases, logo o nosso propósito nesta etapa foi completado.
+
+\end{document}
