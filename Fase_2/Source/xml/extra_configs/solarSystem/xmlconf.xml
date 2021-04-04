@@ -9,7 +9,7 @@
         </group>
         <!-- Mercury -->        
         <group>
-	    <translate X = "6" />
+	    	<translate X = "6" />
             <scale X="0.25" Y="0.25" Z="0.25"/>
             <models>
                 <model file="sphere.3d" />
@@ -17,7 +17,7 @@
         </group>
         <!-- Venus -->        
         <group>
-            <translate X = "10.5" />
+        	<translate X = "10.5" />
             <scale X="0.675" Y="0.675" Z="0.675"/>
             <models>
                 <model file="sphere.3d" />
@@ -30,10 +30,18 @@
             <models>
                 <model file="sphere.3d" />
             </models>
+            <group>
+            	<rotate angle="75"  axisX="0" axisY="1" axisZ="" />
+            	<translate X = "2.9" />
+                <scale X="0.27" Y="0.27" Z="0.27"/>
+                <models>
+                    <model file="sphere.3d" />
+                </models>
+            </group>
         </group>
         <!-- Mars -->
         <group>
-       	    <translate X = "22.5" />
+       	 	<translate X = "22.5" />
             <scale X="0.375" Y="0.375" Z="0.375"/>
             <models>
                 <model file="sphere.3d" />
@@ -50,7 +58,7 @@
         <!-- Saturn -->
         <group>
             <translate X = "138" />
-	    <rotate angle="27"  axisX="1" axisY="0" axisZ="0" />
+	    	<rotate angle="27"  axisX="1" axisY="0" axisZ="0" />
             <scale X="1.05" Y="1.05" Z="1.05"/>
             <models>
                 <model file="sphere.3d" />
