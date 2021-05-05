@@ -33,7 +33,7 @@ string gen_Plane(float width){
     ss << width << " " << 0 << " " << width << "\n";
     ss << -width << " " << 0 << " " << width << "\n";
 
-    return "4\n" + ss.str();
+    return ss.str();
 }
 
 string gen_Box(float x,float y,float z){
@@ -90,7 +90,7 @@ string gen_Box(float x,float y,float z){
     ss << x << " " << -y << " " << -z << "\n";
     ss << -x << " " << -y << " " << -z << "\n";
 
-    return "12\n" + ss.str();
+    return ss.str();
 
 }
 
@@ -98,7 +98,6 @@ string gen_Sphere(float radius,int slices,int stacks){
     float a_interval = 2 * M_PI / slices;
     float b_interval = M_PI / stacks;
     float next_a, next_b;
-    int triangles = 0;
     stringstream ss;
 
     for (float a = 0; a < 2 * M_PI; a +=  a_interval) {
@@ -119,10 +118,9 @@ string gen_Sphere(float radius,int slices,int stacks){
             ss << radius * cos(next_b) * sin(a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(a) << "\n";
             ss << radius * cos(b) * sin(a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(a) << "\n";
 
-            triangles += 2;
         }
     }
-    return to_string(triangles) + "\n" + ss.str();
+    return ss.str();
 }
 
 string gen_Cone(float radius,float height,int slices,int stacks){
@@ -130,7 +128,6 @@ string gen_Cone(float radius,float height,int slices,int stacks){
     float next_h;
     float interval = 2 * M_PI / slices;
     float stack_height = height / stacks;
-    int triangles = 0;
     stringstream ss;
 
     for (float a = 0; a < 2 * M_PI; a += interval) {
@@ -142,7 +139,6 @@ string gen_Cone(float radius,float height,int slices,int stacks){
         ss << radius * sin(next_a) << " " << 0 << " " << radius * cos(next_a) << "\n";
         ss << radius * sin(a) << " " << 0 << " " << radius * cos(a) << "\n";
 
-        triangles += 1;
 
         for (float h = 0; h < height; h += stack_height) {
             next_h = h + stack_height;
@@ -157,11 +153,10 @@ string gen_Cone(float radius,float height,int slices,int stacks){
             ss << radius * sin(a) * ((height - h) / height) << " " << h << " " << radius * cos(a) * ((height - h) / height) << "\n";
             ss << radius * sin(next_a) * ((height - h) / height) << " " << h << " " << radius * cos(next_a) * ((height - h) / height) << "\n";
 
-            triangles += 2;
         }
     }
 
-    return to_string(triangles) + "\n" + ss.str();
+    return ss.str();
 }
 /*---------Functions that calculate model based on Bezier---------*/
 
@@ -175,7 +170,7 @@ vector <float> read_Bezier(string patch, int tesselation){
       getline(myFile, buffer);
     }
     getline(myFile, buffer);
-    p = stoi(buffer);
+    int p = stoi(buffer);
     vector<float> control;
     for(int j = 0; j < p; j+=1){
       for (int i = 0; i < 2; i += 1) {
@@ -189,22 +184,26 @@ vector <float> read_Bezier(string patch, int tesselation){
     return control;
 }
 
-string points_Bezier(float u, float v, vector<float> control){
-  stringstream res;
+
+tuple <float,float,float> getBezierPoint(float u, float v, vector<float> x){
   float bernsteinU[4] = { powf(1-u, 3), 3 * u * powf(1-u, 2), 3 * powf(u, 2) * (1-u), powf(u, 3) };
   float bernsteinV[4] = { powf(1-v, 3), 3 * v * powf(1-v, 2), 3 * powf(v, 2) * (1-v), powf(v, 3) };
   tuple <float,float,float> ponto;
+  get<0>(ponto) = 0.0;
+  get<1>(ponto) = 0.0;
+  get<2>(ponto) = 0.0;
   for (int j=0; j<4; j++){
       for (int i=0; i<4; i++) {
-        int indexCP = j*4+i;
-          get<0>(ponto) = get<0>(ponto) + control[indexCP] * bernsteinU[j] * bernsteinV[i];
-          get<1>(ponto) = get<1>(ponto) + control[indexCP + 1] * bernsteinU[j] * bernsteinV[i];
-          get<2>(ponto) = get<2>(ponto) + control[indexCP + 2] * bernsteinU[j] * bernsteinV[i];
+        int indexCP = j*12+i*3;
+          get<0>(ponto) = get<0>(ponto) + x[indexCP] * bernsteinU[j] * bernsteinV[i];
+          get<1>(ponto) = get<1>(ponto) + x[indexCP + 1] * bernsteinU[j] * bernsteinV[i];
+          get<2>(ponto) = get<2>(ponto) + x[indexCP + 2] * bernsteinU[j] * bernsteinV[i];
       }
-      res << get<0>(ponto) << " " << get<1>(ponto) << " " << get<2>(ponto) << "\n";
   }
-  return res.str();
+  return ponto;
 }
+
+
 
 
 string gen_Bezier(string patch, int tesselation){
@@ -212,31 +211,42 @@ string gen_Bezier(string patch, int tesselation){
   stringstream res;
   ifstream myFile;
   string buffer;
-  tuple <float,float,float> point;
-  vector <tuple<float,float,float>> x;
+  vector <tuple <float,float,float>> pontos ;
+  vector <float> x;
   myFile.open(patch,ios::in|ios::out);
   getline(myFile, buffer);
   int npatches = stoi(buffer);
   for(int i=0;i<npatches;i+=1){
-    for(int p=0;p<16;p+=1){
+    for(int p=0;p<15;p+=1){
       getline(myFile, buffer, ',');
-      get<0>(point) = control[stoi(buffer)];
-      get<1>(point) = control[stoi(buffer)+1];
-      get<2>(point) = control[stoi(buffer)+2];
-      x.push_back(point);
+      x.push_back(control[stoi(buffer)*3]);
+      x.push_back(control[stoi(buffer)*3+1]);
+      x.push_back(control[stoi(buffer)*3+2]);
     }
+    getline(myFile,buffer);
+    x.push_back(control[stoi(buffer)*3]);
+    x.push_back(control[stoi(buffer)*3+1]);
+    x.push_back(control[stoi(buffer)*3+2]);
     for (int tv=0; tv<tesselation; tv++) {
            float v = (float) tv/tesselation;
 
            for (int tu = 0; tu < tesselation; tu++) {
                float u = (float) tu/tesselation;
-
-               // t sup
-               res << points_Bezier((u + (1.0f/tesselation)), (v + (1.0f/tesselation)),control) << points_Bezier(u, (v + (1.0f/tesselation)),control) << points_Bezier(u, v,control);
-               // t inf
-               res << points_Bezier(u, v,control) << points_Bezier((u + (1.0f/tesselation)), v,control) << points_Bezier((u + (1.0f/tesselation)), (v + (1.0f/tesselation)),control);
+                // triângulo superior
+                pontos.push_back(getBezierPoint((u + (1.0f/tesselation)), (v + (1.0f/tesselation)),x));
+                pontos.push_back(getBezierPoint(u, (v + (1.0f/tesselation)),x));
+                pontos.push_back(getBezierPoint(u, v,x));
+                // triângulo inferior
+                pontos.push_back(getBezierPoint(u, v,x));
+                pontos.push_back(getBezierPoint((u + (1.0f/tesselation)), v,x));
+                pontos.push_back(getBezierPoint((u + (1.0f/tesselation)), (v + (1.0f/tesselation)),x));
+                for(int k=0;k<6;k++){
+                  res << get<0>(pontos[k]) << " " << get<1>(pontos[k]) << " " << get<2>(pontos[k]) << "\n";
+                }
+                pontos.clear();
            }
        }
+       x.clear();
     }
     myFile.close();
     return res.str();
@@ -303,8 +313,6 @@ int main(int argc, char* argv[]){
               int tesselation = atoi(argv[3]);
               fname = argv[4];
               res = gen_Bezier(patch,tesselation);
-    } else if(fig == "comet"){
-              cout << "E uma esfera mas o luis diz que nao.\n";
     } else if(fig == "info"){
       cout << "\nplane: generator plane <outfile>\n";
             cout << "\nbox: generator box <X> <Y> <Z> <outfile>\n";
