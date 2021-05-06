@@ -184,7 +184,6 @@ vector <float> read_Bezier(string patch, int tesselation){
     return control;
 }
 
-
 tuple <float,float,float> getBezierPoint(float u, float v, vector<float> x){
   float bernsteinU[4] = { powf(1-u, 3), 3 * u * powf(1-u, 2), 3 * powf(u, 2) * (1-u), powf(u, 3) };
   float bernsteinV[4] = { powf(1-v, 3), 3 * v * powf(1-v, 2), 3 * powf(v, 2) * (1-v), powf(v, 3) };
@@ -202,9 +201,6 @@ tuple <float,float,float> getBezierPoint(float u, float v, vector<float> x){
   }
   return ponto;
 }
-
-
-
 
 string gen_Bezier(string patch, int tesselation){
   vector <float> control = read_Bezier(patch, tesselation);
