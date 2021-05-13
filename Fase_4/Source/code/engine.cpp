@@ -132,6 +132,50 @@ void drawAxis() {
 	glColor3f(0.4f, 0.5f, 1.0f);
 }
 
+
+/*
+ * Carregamento de uma imagem para uma textura RGB na placa gráfica
+ */
+int loadTexture(string s) {
+    unsigned int t, tw, th;
+    unsigned char *texData;
+    unsigned int texID;
+
+    // Iniciar o DevIL
+    ilInit();
+
+    // Colocar a origem da textura no canto inferior esquerdo
+    ilEnable(IL_ORIGIN_SET);
+    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+
+    // Carregar a textura para memória
+    ilGenImages(1,&t);
+    ilBindImage(t);
+    ilLoadImage((ILstring)s.c_str());
+    tw = ilGetInteger(IL_IMAGE_WIDTH);
+    th = ilGetInteger(IL_IMAGE_HEIGHT);
+
+    ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+    texData = ilGetData();
+
+    //Gerar a textura para a placa gráfica
+    glGenTextures(1,&texID);
+
+    glBindTexture(GL_TEXTURE_2D,texID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    //Upload dos dados da imagem
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tw, th, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return texID;
+}
+
 void readXML_aux(XMLNode* node) {
 	string value = node->Value();
 	float angle, x, y, z;
@@ -195,6 +239,11 @@ void readXML_aux(XMLNode* node) {
 	}
 	else if (strcmp(value.c_str(), "models") == 0) {
 		for (XMLElement* children = node_elem->FirstChildElement(); children != nullptr; children = children->NextSiblingElement()) {
+			/*
+			if(modelsNode->Attribute("texture")){
+                           string textureName = models_path + modelsNode->Attribute("texture");
+                           t.figure.texture = loadTexture(textureName);
+			*/	
 			int model_size;
 			FIGURE new_figure;
 			new_figure.beg = v.size() / 3;
@@ -510,6 +559,22 @@ void onKeyUp(int key, int x, int y) {
 	}
 }
 
+//Lights
+void initGL() {
+    // alguns settings para OpenGL
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+    glClearColor(0, 0, 0, 0);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+}
+
 int main(int argc, char** argv) {
 	alpha = INIT_ALPHA;
 	beta = INIT_BETA;
@@ -530,7 +595,11 @@ int main(int argc, char** argv) {
 	glutIdleFunc(renderScene);
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
-
+	#ifndef __APPLE__
+        glewInit();
+        #endif
+        initGL();
+	
 	//FPS Counter
 	timebase = glutGet(GLUT_ELAPSED_TIME);
 
