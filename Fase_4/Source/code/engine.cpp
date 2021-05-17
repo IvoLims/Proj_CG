@@ -29,8 +29,6 @@ using namespace tinyxml2;
 #define ALPHA_JUMP 0.1
 #define BETA_JUMP 0.08
 #define UNIT 15
-#define EARTH_SIZE 1.5
-#define EARTH_ORBIT_SPEED 6
 #define CATMULL_MAX 10
 
 //Explorer Mode Camera
@@ -68,7 +66,7 @@ struct FIGURE {
 	int count;
 	float translation_time;
 	float catmull_points[10][3];
-	int catmull_points_size;	
+	int catmull_points_size;
 	float rotation_time;
 	float rotation_coordinates[3];
 	int trans_or_rot;
@@ -81,11 +79,17 @@ float catmull_points[10][3];
 int catmull_points_size = 0; //number of points
 float rotation_time = 0;
 float rotation_coordinates[3];
-int trans_or_rot; 
+int trans_or_rot;
 
 void timer(int value) {
 	glutPostRedisplay();
 	glutTimerFunc(1, timer, 0);
+}
+
+// For lights
+
+void putLights(string type, float x, float y, float z, float dirX, float dirY, float dirZ, float cutoff, float exponent, float ambR, float ambG, float ambB) {
+
 }
 
 void changeSize(int w, int h) {
@@ -132,50 +136,6 @@ void drawAxis() {
 	glColor3f(0.4f, 0.5f, 1.0f);
 }
 
-
-/*
- * Carregamento de uma imagem para uma textura RGB na placa gráfica
- */
-int loadTexture(string s) {
-    unsigned int t, tw, th;
-    unsigned char *texData;
-    unsigned int texID;
-
-    // Iniciar o DevIL
-    ilInit();
-
-    // Colocar a origem da textura no canto inferior esquerdo
-    ilEnable(IL_ORIGIN_SET);
-    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-
-    // Carregar a textura para memória
-    ilGenImages(1,&t);
-    ilBindImage(t);
-    ilLoadImage((ILstring)s.c_str());
-    tw = ilGetInteger(IL_IMAGE_WIDTH);
-    th = ilGetInteger(IL_IMAGE_HEIGHT);
-
-    ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
-    texData = ilGetData();
-
-    //Gerar a textura para a placa gráfica
-    glGenTextures(1,&texID);
-
-    glBindTexture(GL_TEXTURE_2D,texID);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-    //Upload dos dados da imagem
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tw, th, GL_RGBA, GL_UNSIGNED_BYTE, texData);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return texID;
-}
-
 void readXML_aux(XMLNode* node) {
 	string value = node->Value();
 	float angle, x, y, z;
@@ -212,7 +172,7 @@ void readXML_aux(XMLNode* node) {
 			glTranslatef(x, y, z);
 		}
 	}
-	else if (strcmp(value.c_str(), "rotate") == 0) {		
+	else if (strcmp(value.c_str(), "rotate") == 0) {
 		if (node_elem->DoubleAttribute("time") > 0) {
 			rotation_time = node_elem->DoubleAttribute("time");
 			x = node_elem->DoubleAttribute("axisX");
@@ -223,7 +183,7 @@ void readXML_aux(XMLNode* node) {
 			rotation_coordinates[2] = z;
 			trans_or_rot = 1;
 		}
-		else{
+		else {
 			angle = node_elem->DoubleAttribute("angle");
 			x = node_elem->DoubleAttribute("axisX");
 			y = node_elem->DoubleAttribute("axisY");
@@ -237,36 +197,62 @@ void readXML_aux(XMLNode* node) {
 		z = node_elem->DoubleAttribute("Z");
 		glScalef(x, y, z);
 	}
+	else if (strcmp(value.c_str(), "lights") == 0) {
+		for (XMLElement* children = node_elem->FirstChildElement(); children != nullptr; children = children->NextSiblingElement()) {
+			if (children->Attribute("type") > 0) {
+				//glEnable(GL_LIGHTING);
+				string type = children->Attribute("type");
+				if (type == "POINT" || type == "DIRECTIONAL") {
+					x = children->DoubleAttribute("X");
+					y = children->DoubleAttribute("Y");
+					z = children->DoubleAttribute("Z");
+					float ambR = children->DoubleAttribute("ambiR");
+					float ambG = children->DoubleAttribute("ambiG");
+					float ambB = children->DoubleAttribute("ambiB");
+					putLights(type, x, y, z, 0.0f, 0.0f, -1.0f, 180.0f, 0.0f, ambR, ambG, ambB);
+				}
+				else {
+					x = children->DoubleAttribute("X");
+					y = children->DoubleAttribute("Y");
+					z = children->DoubleAttribute("Z");
+					float dirX = children->DoubleAttribute("dirX");
+					float dirY = children->DoubleAttribute("dirY");
+					float dirZ = children->DoubleAttribute("dirZ");
+					float cutoff = children->DoubleAttribute("cutoff");
+					float exponent = children->DoubleAttribute("exponent");
+					float ambR = children->DoubleAttribute("ambiR");
+					float ambG = children->DoubleAttribute("ambiG");
+					float ambB = children->DoubleAttribute("ambiB");
+					putLights(type, x, y, z, dirX, dirY, dirZ, cutoff, exponent, ambR, ambG, ambB);
+				}
+			}
+		}
+	}
 	else if (strcmp(value.c_str(), "models") == 0) {
 		for (XMLElement* children = node_elem->FirstChildElement(); children != nullptr; children = children->NextSiblingElement()) {
-			/*
-			if(modelsNode->Attribute("texture")){
-                           string textureName = models_path + modelsNode->Attribute("texture");
-                           t.figure.texture = loadTexture(textureName);
-			*/	
-			int model_size;
-			FIGURE new_figure;
-			new_figure.beg = v.size() / 3;
+			int model_size = 0;
+
 			file.open(children->Attribute("file"));
 			if (!file) {
 				cout << "There isn't one attribute 'file' in the XML file" << endl;
 				continue;
 			}
-			file >> ch;
-			model_size = stoi(ch) * 3;
+			FIGURE new_figure;
+			new_figure.beg = v.size() / 3;
 			for (file >> ch; !file.eof(); file >> ch) {
 				v.push_back(stof(ch));
+				model_size++;
 			}
 			file.close();
-			new_figure.count = model_size;
+			new_figure.count = model_size / 3;
 			glGetFloatv(GL_MODELVIEW_MATRIX, new_figure.m);
-			
+
 			//catmull points
 			new_figure.catmull_points_size = catmull_points_size;
-			for (int i =0; i < catmull_points_size; i++) {
+			for (int i = 0; i < catmull_points_size; i++) {
 				for (int j = 0; j < 3; j++) {
 					new_figure.catmull_points[i][j] = catmull_points[i][j];
-				}				
+				}
 			}
 			new_figure.translation_time = translation_time;
 			//rotation
@@ -324,9 +310,9 @@ void multVectorVector(float* m, float* v, float* res) {
 
 void getCatmullRomPoint(float t, float* p0, float* p1, float* p2, float* p3, float* pos, float* deriv) {
 	float m[16] = { -0.5f,  1.5f, -1.5f,  0.5f,
-				     1.0f, -2.5f,  2.0f, -0.5f,
-			    	-0.5f,  0.0f,  0.5f,  0.0f,
-				     0.0f,  1.0f,  0.0f,  0.0f };
+					 1.0f, -2.5f,  2.0f, -0.5f,
+					-0.5f,  0.0f,  0.5f,  0.0f,
+					 0.0f,  1.0f,  0.0f,  0.0f };
 	float p_t[4][4] = { { p0[0],  p1[0], p2[0],  p3[0]},
 						{ p0[1],  p1[1], p2[1],  p3[1]},
 						{ p0[2],  p1[2], p2[2],  p3[2]},
@@ -346,13 +332,13 @@ void getCatmullRomPoint(float t, float* p0, float* p1, float* p2, float* p3, flo
 
 void getGlobalCatmullRomPoint(float gt, float p[10][3], int p_size, float* pos, float* deriv) {
 
-	float t = gt * (p_size ); // this is the real global t
+	float t = gt * (p_size); // this is the real global t
 	int index = floor(t);  // which segment
 	t = t - index; // where within  the segment
 
 	// indices store the points
 	int indices[4];
-	indices[0] = (index + (p_size) - 1) % (p_size);
+	indices[0] = (index + (p_size)-1) % (p_size);
 	indices[1] = (indices[0] + 1) % (p_size);
 	indices[2] = (indices[1] + 1) % (p_size);
 	indices[3] = (indices[2] + 1) % (p_size);
@@ -377,7 +363,7 @@ void renderScene(void) {
 			px = r * cos(beta) * sin(alpha); py = r * sin(beta); pz = r * cos(beta) * cos(alpha);
 			vx = 0; vy = 0; vz = 0;
 		}
-		else if(first == false){
+		else if (first == false) {
 			vx = cos(beta) * sin(alpha), vy = sin(beta), vz = cos(beta) * cos(alpha);
 			px = r * vx; py = r * vy; pz = r * vz;
 		}
@@ -407,14 +393,15 @@ void renderScene(void) {
 		vx = px - dx, vy = py - dy, vz = pz - dz;
 	}
 	gluLookAt(px, py, pz, vx, vy, vz, 0.0f, 1.0f, 0.0f);
+
 	// put drawing instructions here
 	drawAxis();
 	glBindBuffer(GL_ARRAY_BUFFER, vertices);
 	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glColor3f(0.5, 0.5, 0.6);
 	for (int i = 0; i < figures.size(); i++) {
-		glPushMatrix();	
-		if (figures[i].trans_or_rot == 1 || figures[i].trans_or_rot == 0){
+		glPushMatrix();
+		if (figures[i].trans_or_rot == 1 || figures[i].trans_or_rot == 0) {
 			if (figures[i].catmull_points_size >= 4 && figures[i].translation_time > 0) {
 				gt = fmod(glutGet(GLUT_ELAPSED_TIME), (float)(figures[i].translation_time * 1000)) / (figures[i].translation_time * 1000);
 				getGlobalCatmullRomPoint(gt, figures[i].catmull_points, figures[i].catmull_points_size, pos, deriv);
@@ -425,7 +412,7 @@ void renderScene(void) {
 				glRotatef(-angle, figures[i].rotation_coordinates[0], figures[i].rotation_coordinates[1], figures[i].rotation_coordinates[2]);
 			}
 		}
-		else if (figures[i].trans_or_rot == 2) {			
+		else if (figures[i].trans_or_rot == 2) {
 			if (figures[i].rotation_time > 0) {
 				angle = 360 * (fmod(glutGet(GLUT_ELAPSED_TIME), (float)(figures[i].rotation_time * 1000)) / (figures[i].rotation_time * 1000));
 				glRotatef(-angle, figures[i].rotation_coordinates[0], figures[i].rotation_coordinates[1], figures[i].rotation_coordinates[2]);
@@ -438,7 +425,7 @@ void renderScene(void) {
 		}
 
 		glMultMatrixf(figures[i].m);
-		
+
 		glDrawArrays(GL_TRIANGLES, figures[i].beg, figures[i].count);
 		glPopMatrix();
 	}
@@ -460,6 +447,7 @@ void renderScene(void) {
 }
 
 // write function to process keyboard events
+
 void mouse(int button, int state, int mouse_x, int mouse_y) {
 	if (state == GLUT_DOWN) {
 		mouse_x_init = mouse_x;
@@ -559,22 +547,6 @@ void onKeyUp(int key, int x, int y) {
 	}
 }
 
-//Lights
-void initGL() {
-    // alguns settings para OpenGL
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-    glClearColor(0, 0, 0, 0);
-
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-}
-
 int main(int argc, char** argv) {
 	alpha = INIT_ALPHA;
 	beta = INIT_BETA;
@@ -595,11 +567,7 @@ int main(int argc, char** argv) {
 	glutIdleFunc(renderScene);
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
-	#ifndef __APPLE__
-        glewInit();
-        #endif
-        initGL();
-	
+
 	//FPS Counter
 	timebase = glutGet(GLUT_ELAPSED_TIME);
 
