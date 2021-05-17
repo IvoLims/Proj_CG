@@ -55,7 +55,7 @@ struct FIGURE {
 	int count;
 	float translation_time;
 	float catmull_points[10][3];
-	int catmull_points_size;	
+	int catmull_points_size;
 	float rotation_time;
 	float rotation_coordinates[3];
 	int trans_or_rot;
@@ -68,7 +68,7 @@ float catmull_points[10][3];
 int catmull_points_size = 0; //number of points
 float rotation_time = 0;
 float rotation_coordinates[3];
-int trans_or_rot; 
+int trans_or_rot;
 
 void timer(int value) {
 	glutPostRedisplay();
@@ -155,7 +155,7 @@ void readXML_aux(XMLNode* node) {
 			glTranslatef(x, y, z);
 		}
 	}
-	else if (strcmp(value.c_str(), "rotate") == 0) {		
+	else if (strcmp(value.c_str(), "rotate") == 0) {
 		if (node_elem->DoubleAttribute("time") > 0) {
 			rotation_time = node_elem->DoubleAttribute("time");
 			x = node_elem->DoubleAttribute("axisX");
@@ -166,7 +166,7 @@ void readXML_aux(XMLNode* node) {
 			rotation_coordinates[2] = z;
 			trans_or_rot = 1;
 		}
-		else{
+		else {
 			angle = node_elem->DoubleAttribute("angle");
 			x = node_elem->DoubleAttribute("axisX");
 			y = node_elem->DoubleAttribute("axisY");
@@ -182,29 +182,29 @@ void readXML_aux(XMLNode* node) {
 	}
 	else if (strcmp(value.c_str(), "models") == 0) {
 		for (XMLElement* children = node_elem->FirstChildElement(); children != nullptr; children = children->NextSiblingElement()) {
-			int model_size;
-			FIGURE new_figure;
-			new_figure.beg = v.size() / 3;
+			int model_size = 0;
+			
 			file.open(children->Attribute("file"));
 			if (!file) {
 				cout << "There isn't one attribute 'file' in the XML file" << endl;
 				continue;
 			}
-			file >> ch;
-			model_size = stoi(ch) * 3;
+			FIGURE new_figure;
+			new_figure.beg = v.size() / 3;
 			for (file >> ch; !file.eof(); file >> ch) {
 				v.push_back(stof(ch));
+				model_size++;
 			}
 			file.close();
-			new_figure.count = model_size;
+			new_figure.count = model_size / 3;
 			glGetFloatv(GL_MODELVIEW_MATRIX, new_figure.m);
-			
+
 			//catmull points
 			new_figure.catmull_points_size = catmull_points_size;
-			for (int i =0; i < catmull_points_size; i++) {
+			for (int i = 0; i < catmull_points_size; i++) {
 				for (int j = 0; j < 3; j++) {
 					new_figure.catmull_points[i][j] = catmull_points[i][j];
-				}				
+				}
 			}
 			new_figure.translation_time = translation_time;
 			//rotation
@@ -262,9 +262,9 @@ void multVectorVector(float* m, float* v, float* res) {
 
 void getCatmullRomPoint(float t, float* p0, float* p1, float* p2, float* p3, float* pos, float* deriv) {
 	float m[16] = { -0.5f,  1.5f, -1.5f,  0.5f,
-				     1.0f, -2.5f,  2.0f, -0.5f,
-			    	-0.5f,  0.0f,  0.5f,  0.0f,
-				     0.0f,  1.0f,  0.0f,  0.0f };
+					 1.0f, -2.5f,  2.0f, -0.5f,
+					-0.5f,  0.0f,  0.5f,  0.0f,
+					 0.0f,  1.0f,  0.0f,  0.0f };
 	float p_t[4][4] = { { p0[0],  p1[0], p2[0],  p3[0]},
 						{ p0[1],  p1[1], p2[1],  p3[1]},
 						{ p0[2],  p1[2], p2[2],  p3[2]},
@@ -284,13 +284,13 @@ void getCatmullRomPoint(float t, float* p0, float* p1, float* p2, float* p3, flo
 
 void getGlobalCatmullRomPoint(float gt, float p[10][3], int p_size, float* pos, float* deriv) {
 
-	float t = gt * (p_size ); // this is the real global t
+	float t = gt * (p_size); // this is the real global t
 	int index = floor(t);  // which segment
 	t = t - index; // where within  the segment
 
 	// indices store the points
 	int indices[4];
-	indices[0] = (index + (p_size) - 1) % (p_size);
+	indices[0] = (index + (p_size)-1) % (p_size);
 	indices[1] = (indices[0] + 1) % (p_size);
 	indices[2] = (indices[1] + 1) % (p_size);
 	indices[3] = (indices[2] + 1) % (p_size);
@@ -310,7 +310,7 @@ void renderScene(void) {
 	// set the camera
 	glLoadIdentity();
 	px = r * cos(beta) * sin(alpha), py = r * sin(beta), pz = r * cos(beta) * cos(alpha);
-	gluLookAt(px, py, pz, 0, 0, 0, 0, 1, 0);	
+	gluLookAt(px, py, pz, 0, 0, 0, 0, 1, 0);
 
 	// put drawing instructions here
 	drawAxis();
@@ -318,8 +318,8 @@ void renderScene(void) {
 	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glColor3f(0.5, 0.5, 0.6);
 	for (int i = 0; i < figures.size(); i++) {
-		glPushMatrix();	
-		if (figures[i].trans_or_rot == 1 || figures[i].trans_or_rot == 0){
+		glPushMatrix();
+		if (figures[i].trans_or_rot == 1 || figures[i].trans_or_rot == 0) {
 			if (figures[i].catmull_points_size >= 4 && figures[i].translation_time > 0) {
 				gt = fmod(glutGet(GLUT_ELAPSED_TIME), (float)(figures[i].translation_time * 1000)) / (figures[i].translation_time * 1000);
 				getGlobalCatmullRomPoint(gt, figures[i].catmull_points, figures[i].catmull_points_size, pos, deriv);
@@ -330,7 +330,7 @@ void renderScene(void) {
 				glRotatef(-angle, figures[i].rotation_coordinates[0], figures[i].rotation_coordinates[1], figures[i].rotation_coordinates[2]);
 			}
 		}
-		else if (figures[i].trans_or_rot == 2) {			
+		else if (figures[i].trans_or_rot == 2) {
 			if (figures[i].rotation_time > 0) {
 				angle = 360 * (fmod(glutGet(GLUT_ELAPSED_TIME), (float)(figures[i].rotation_time * 1000)) / (figures[i].rotation_time * 1000));
 				glRotatef(-angle, figures[i].rotation_coordinates[0], figures[i].rotation_coordinates[1], figures[i].rotation_coordinates[2]);
@@ -343,7 +343,7 @@ void renderScene(void) {
 		}
 
 		glMultMatrixf(figures[i].m);
-		
+
 		glDrawArrays(GL_TRIANGLES, figures[i].beg, figures[i].count);
 		glPopMatrix();
 	}
