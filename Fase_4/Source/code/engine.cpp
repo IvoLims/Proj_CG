@@ -10,6 +10,7 @@
 #include <GL/glut.h>
 #endif
 
+#include <IL/il.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -56,9 +57,15 @@ int window;
 int timebase;
 float frame;
 
+//Lights
+GLfloat dark[4] = { 0.2, 0.2, 0.2, 1.0 };
+GLfloat white[4] = { 0.8, 0.8, 0.8, 1.0 };
+
 //VBO
-GLuint vertices, verticeCount;
-vector<float> v;
+GLuint buffers[3];
+vector<float> v; 
+vector<float> n; 
+vector<float> t;
 
 //Figures
 struct FIGURE {
@@ -71,6 +78,14 @@ struct FIGURE {
 	float rotation_coordinates[3];
 	int trans_or_rot;
 	GLfloat m[16];
+
+	float dif[4];
+	float amb[4];
+	float emi[4];
+	float spe[4];
+	float shi;
+
+	string texture;
 };
 vector<FIGURE> figures;
 
@@ -79,18 +94,15 @@ float catmull_points[10][3];
 int catmull_points_size = 0; //number of points
 float rotation_time = 0;
 float rotation_coordinates[3];
-int trans_or_rot;
+int trans_or_rot = -1;
+
+int next_light = 0;
 
 void timer(int value) {
 	glutPostRedisplay();
 	glutTimerFunc(1, timer, 0);
 }
 
-// For lights
-
-void putLights(string type, float x, float y, float z, float dirX, float dirY, float dirZ, float cutoff, float exponent, float ambR, float ambG, float ambB) {
-
-}
 
 void changeSize(int w, int h) {
 
@@ -200,30 +212,45 @@ void readXML_aux(XMLNode* node) {
 	else if (strcmp(value.c_str(), "lights") == 0) {
 		for (XMLElement* children = node_elem->FirstChildElement(); children != nullptr; children = children->NextSiblingElement()) {
 			if (children->Attribute("type") > 0) {
-				//glEnable(GL_LIGHTING);
 				string type = children->Attribute("type");
-				if (type == "POINT" || type == "DIRECTIONAL") {
-					x = children->DoubleAttribute("X");
-					y = children->DoubleAttribute("Y");
-					z = children->DoubleAttribute("Z");
-					float ambR = children->DoubleAttribute("ambiR");
-					float ambG = children->DoubleAttribute("ambiG");
-					float ambB = children->DoubleAttribute("ambiB");
-					putLights(type, x, y, z, 0.0f, 0.0f, -1.0f, 180.0f, 0.0f, ambR, ambG, ambB);
+				if (type == "POINT" ) {
+					x = children->DoubleAttribute("posX");
+					y = children->DoubleAttribute("posY");
+					z = children->DoubleAttribute("posZ");
+					float att = children->DoubleAttribute("att");
+					float pos[4] = { x, y, z, 1.0 };
+					glEnable(GL_LIGHT0 + next_light);
+					glLightfv(GL_LIGHT0 + next_light, GL_POSITION, pos);
+					//glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, att);
+					next_light++;
 				}
-				else {
-					x = children->DoubleAttribute("X");
-					y = children->DoubleAttribute("Y");
-					z = children->DoubleAttribute("Z");
+				else if (type == "DIRECTIONAL") {
+					x = children->DoubleAttribute("dirX");
+					y = children->DoubleAttribute("dirY");
+					z = children->DoubleAttribute("dirZ");
+					float pos[4] = { x, y, z, 0.0 };
+					glEnable(GL_LIGHT0 + next_light);
+					glLightfv(GL_LIGHT0 + next_light, GL_POSITION, pos);
+					next_light++;					
+				}
+				else if (type == "SPOT") {
+					x = children->DoubleAttribute("posX");
+					y = children->DoubleAttribute("posY");
+					z = children->DoubleAttribute("posZ");
 					float dirX = children->DoubleAttribute("dirX");
 					float dirY = children->DoubleAttribute("dirY");
 					float dirZ = children->DoubleAttribute("dirZ");
-					float cutoff = children->DoubleAttribute("cutoff");
-					float exponent = children->DoubleAttribute("exponent");
-					float ambR = children->DoubleAttribute("ambiR");
-					float ambG = children->DoubleAttribute("ambiG");
-					float ambB = children->DoubleAttribute("ambiB");
-					putLights(type, x, y, z, dirX, dirY, dirZ, cutoff, exponent, ambR, ambG, ambB);
+					float cutoff[] = { children->DoubleAttribute("cutoff") };
+					float exponent[] = { children->DoubleAttribute("exp") };
+					float att = children->DoubleAttribute("att");
+					float pos[4] = { x, y, z, 1.0 };
+					float spotDir[3] = { dirX, dirY, dirZ };
+					glEnable(GL_LIGHT0 + next_light);
+					glLightfv(GL_LIGHT0 + next_light, GL_POSITION, pos);
+					glLightfv(GL_LIGHT0 + next_light, GL_SPOT_DIRECTION, spotDir);
+					glLightfv(GL_LIGHT0 + next_light, GL_SPOT_CUTOFF, cutoff);
+					glLightfv(GL_LIGHT0 + next_light, GL_SPOT_EXPONENT, exponent);
+					next_light++;
 				}
 			}
 		}
@@ -231,7 +258,6 @@ void readXML_aux(XMLNode* node) {
 	else if (strcmp(value.c_str(), "models") == 0) {
 		for (XMLElement* children = node_elem->FirstChildElement(); children != nullptr; children = children->NextSiblingElement()) {
 			int model_size = 0;
-
 			file.open(children->Attribute("file"));
 			if (!file) {
 				cout << "There isn't one attribute 'file' in the XML file" << endl;
@@ -239,12 +265,24 @@ void readXML_aux(XMLNode* node) {
 			}
 			FIGURE new_figure;
 			new_figure.beg = v.size() / 3;
-			for (file >> ch; !file.eof(); file >> ch) {
-				v.push_back(stof(ch));
+			file >> ch;
+			while (!file.eof()) {
+				for (int i = 0; i < 3 && !file.eof(); i++) {
+					v.push_back(stof(ch));
+					file >> ch;
+				}
+				//for (int i = 0; i < 3 && !file.eof(); i++){
+				//	n.push_back(stof(ch));
+				//	file >> ch;
+				// }
+				//for (int i = 0; i < 2 && !file.eof(); i++)
+				//	t.push_back(stof(ch));
+				//	file >> ch;
+				// }
 				model_size++;
 			}
 			file.close();
-			new_figure.count = model_size / 3;
+			new_figure.count = model_size;
 			glGetFloatv(GL_MODELVIEW_MATRIX, new_figure.m);
 
 			//catmull points
@@ -255,13 +293,38 @@ void readXML_aux(XMLNode* node) {
 				}
 			}
 			new_figure.translation_time = translation_time;
+
 			//rotation
 			new_figure.rotation_time = rotation_time;
 			new_figure.rotation_coordinates[0] = rotation_coordinates[0];
 			new_figure.rotation_coordinates[1] = rotation_coordinates[1];
 			new_figure.rotation_coordinates[2] = rotation_coordinates[2];
 			new_figure.trans_or_rot = trans_or_rot;
+			
+			//colours
+			new_figure.dif[0] = children->DoubleAttribute("diffR");
+			new_figure.dif[1] = children->DoubleAttribute("diffG");
+			new_figure.dif[2] = children->DoubleAttribute("diffB");
+			new_figure.dif[3] = 1.0f;
+			new_figure.amb[0] = children->DoubleAttribute("ambiR");
+			new_figure.amb[1] = children->DoubleAttribute("ambiG");
+			new_figure.amb[2] = children->DoubleAttribute("ambiB");
+			new_figure.amb[3] = 1.0;
+			new_figure.emi[0] = children->DoubleAttribute("emisR");
+			new_figure.emi[1] = children->DoubleAttribute("emisG");
+			new_figure.emi[2] = children->DoubleAttribute("emisB");
+			new_figure.emi[3] = 1.0;
+			new_figure.spe[0] = children->DoubleAttribute("specR");
+			new_figure.spe[1] = children->DoubleAttribute("specG");
+			new_figure.spe[2] = children->DoubleAttribute("specB");
+			new_figure.spe[3] = 1.0;
+			new_figure.shi = children->DoubleAttribute("shin");
+
+			//textures
+			new_figure.texture = children->DoubleAttribute("texture");	
+
 			figures.push_back(new_figure);
+
 		}
 	}
 	if (node->NextSiblingElement() != nullptr) {
@@ -273,6 +336,7 @@ void readXML() {
 	string value;
 	XMLDocument doc;
 	XMLError load = doc.LoadFile("xmlconf.xml");
+	next_light = 0;
 	if (load != XML_SUCCESS) {
 		cout << "Error in XML file\n" << endl;
 		return;
@@ -283,13 +347,19 @@ void readXML() {
 		node = node->FirstChildElement();
 	}
 	readXML_aux(node);
-	glGenBuffers(1, &vertices);
-	glBindBuffer(GL_ARRAY_BUFFER, vertices);
+	glGenBuffers(1, buffers);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
 	glBufferData(
-		GL_ARRAY_BUFFER,
-		sizeof(float) * v.size(),
-		v.data(),
-		GL_STATIC_DRAW);
+		GL_ARRAY_BUFFER, sizeof(float) * v.size(), v.data(), GL_STATIC_DRAW);
+	
+	//glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+	//glBufferData(
+	//	GL_ARRAY_BUFFER, sizeof(float) * n.size(), n.data(), GL_STATIC_DRAW);
+	/*
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+	glBufferData(
+		GL_ARRAY_BUFFER, sizeof(float) * t.size(), t.data(), GL_STATIC_DRAW);
+	*/
 }
 
 void multMatrixVector(float* m, float* v, float* res) {
@@ -396,9 +466,15 @@ void renderScene(void) {
 
 	// put drawing instructions here
 	drawAxis();
-	glBindBuffer(GL_ARRAY_BUFFER, vertices);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
 	glVertexPointer(3, GL_FLOAT, 0, 0);
-	glColor3f(0.5, 0.5, 0.6);
+
+	//glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+	//glNormalPointer(GL_FLOAT, 0, 0);
+
+	//glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+	//glTexCoordPointer(2, GL_FLOAT, 0, 0);
+
 	for (int i = 0; i < figures.size(); i++) {
 		glPushMatrix();
 		if (figures[i].trans_or_rot == 1 || figures[i].trans_or_rot == 0) {
@@ -425,7 +501,15 @@ void renderScene(void) {
 		}
 
 		glMultMatrixf(figures[i].m);
+		
+		if (strcmp(figures[i].texture.c_str(), "") != 0) {
+			loadTexture(figures[i].texture);
+		}
 
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, figures[i].dif);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, dark);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+		glMaterialf(GL_FRONT, GL_SHININESS, 128);
 		glDrawArrays(GL_TRIANGLES, figures[i].beg, figures[i].count);
 		glPopMatrix();
 	}
@@ -520,9 +604,7 @@ void onKeyDown(int key, int x, int y) {
 	case GLUT_KEY_HOME: {
 		fpsOn = !fpsOn;
 		first = false;
-		//rx = px;
-		//ry = py;
-		//rz = pz;
+		r = sqrt(pow(px, 2) + pow(py, 2) + pow(pz, 2));
 		break;
 	}
 	default: {
@@ -578,11 +660,12 @@ int main(int argc, char** argv) {
 	glutMotionFunc(mouseM);
 
 	//  OpenGL settings
+	glEnable(GL_LIGHTING);
+
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT, GL_LINE);
-	//glutTimerFunc(0, timer, 0);
 
 	// enter GLUT's main cycle
 	glutMainLoop();
