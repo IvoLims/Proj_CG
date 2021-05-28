@@ -1,0 +1,285 @@
+
+\documentclass[11pt,a4paper]{report}
+
+\usepackage[portuges]{babel}
+\usepackage[utf8]{inputenc} % define o encoding usado texto fonte (input)--usual "utf8" ou "latin1
+\usepackage{graphicx} %permite incluir graficos, tabelas, figuras
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{multicol}
+\usepackage{indentfirst}
+
+\definecolor{myblue}{rgb}{0.2,0.2,0.8}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstdefinestyle{code}{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{white},      % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1000,                % start line enumeration with line 1
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=C++,                    % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\lstdefinestyle{xml}{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{white},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1000,                % start line enumeration with line 1
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=XML,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\title{Computação Gráfica (3º ano de Curso)\\
+       \textbf{Fase 4}\\ Relatório de Desenvolvimento
+       } %Titulo do documento
+%\title{Um Exemplo de Artigo em \LaTeX}
+\author{Diogo Fernandes\\ (A87968) \and Luís Guimarães\\ (A87947)
+         \and Ivo Lima\\ (A90214)
+       } %autores do documento
+\date{\today} %data
+
+\begin{document}
+	\begin{minipage}{0.9\linewidth}
+        \centering
+		\includegraphics[width=0.4\textwidth]{um.jpeg}\par\vspace{1cm}
+		{\scshape\LARGE Universidade do Minho} \par
+		\vspace{0.6cm}
+		{\scshape\Large Licenciatura em Ciências da Computação} \par
+		\maketitle
+	\end{minipage}
+
+
+\tableofcontents % insere Indice
+
+\chapter{Introdução}
+Uma vez que esta é a última fase foi pedido uma série de novas implementações. O \emph{generator} passou a gerar, para além das coordenadas dos pontos, as normais e as as coordenadas de textura. 
+
+Para conseguirmos tirar partido dessa nova informação incluída nos modelos 3D, tivemos de ativar as luzes e as texturas no OpenGL e definir as propriedades de cada modelo, para assim utilizarmos este novo tipo de coloração.
+
+Posto isto, estabelecemos um conjunto de tarefas que incidiram tanto sobre o \emph{generator} como a \emph{engine} para que esta possa suportar os requisitos indicados no enunciado e outros definidos por nós:
+
+{\bfseries Atualizações no \emph{generator}:}
+\begin{enumerate} 
+\item Gerar as normais e as coordenadas de textura dos modelos atualizados;
+\end{enumerate}
+
+{\bfseries Atualizações na \emph{engine}:}
+\begin{enumerate} 
+\item Atualizar o parser de modo a dar suporte aos novos tipos de configuração xml e atualizar/criar estruturas de dados para guardar as propriedades das luzes, materiais e texturas;
+\item Introduzir uma câmara fps, assim como outras features para facilitar o debug/visualização do ambiente;
+\end{enumerate}
+\chapter{Atualização do \emph{generator}}
+\section{Nova configuração de geração de modelos}
+
+Segue-se uma breve descrição daquilo que foi alterado tanto a nível dos algoritmos dos modelos como a geração das normais, coordenadas de textura, entre outros.
+
+\chapter{Atualização da \emph{engine}}
+
+\section{Nova configuração do xml}
+O ficheiro de configuração do \emph{xml} que temos vindo a utilizar deu suporte às luzes, que definirão a nossa \emph{scene} que podem ser definidas de 3 tipos distintos: \textbf{\emph{spot}}, \textbf{ \emph{point}} e \textbf{\emph{directional}}.
+
+A definição das luzes deverá aparecer da seguinte forma: 
+
+As \textbf{\emph{spotlight}} simulam uma luz parecida aquela vinda de uma lanterna, sendo que para obtermos tal funcionalidade devemos especificar um ponto, uma direção, a abertura da luz (cutoff) e um expoente para definir a sua intensidade.
+
+\begin{lstlisting}[style = xml]
+<lights>
+    <light type="SPOT" posX="..." posY="..." posZ="..."
+                       dirX="..." dirY="..." dirZ="..."
+                       cutoff="..." exponent="..." />
+<lights>
+\end{lstlisting}
+
+No caso das luzes de tipo \textbf{ \emph{point}} que são definidas num ponto e emitem em todas as direções. Terá a seguinte definição:
+
+\begin{lstlisting}[style = xml]
+<lights>
+    <light type="POINT" posX="..." posY="..." posZ="..." />
+</lights>
+\end{lstlisting}
+
+Já as \textbf{\emph{directional}} \emph{lights} não estão definidas num ponto pois seguem uma dada direção.
+\begin{lstlisting}[style = xml]
+<lights>
+   <light type="DIRECTIONAL" dirX="..." dirY="..." dirZ="..." />
+</lights>
+\end{lstlisting}
+
+\iffalse 
+Para todos os tipos de luzes enunciados a cima podem especificar a intensidade RGB das luzes no que toca à componente difusa, ambiente e especular, assim:
+\begin{lstlisting}[style = xml]
+<light ... ambiR="..." ambiG="..." ambiB="..."
+           specR="..." specG="..." specB="..."
+           diffR="..." diffG="..." diffB="..." />
+\end{lstlisting}
+\fi
+
+Os modelos passam a ser desenhados com cor, sendo possível especificar cada tipo de cor no modelo RGB:
+\begin{lstlisting}[style = xml]
+< model file = "..." ambiR="..." ambiG="..." ambiB="..."
+		   emisR="..." emisG="..." emisB="..."
+           specR="..." specG="..." specB="..."
+           diffR="..." diffG="..." diffB="..." />
+\end{lstlisting}
+
+Podem também ser desenhados modelos com uma determinada textura:
+\begin{lstlisting}[style = xml]
+< model file = "..." texture="..." />
+\end{lstlisting}
+
+Ou com cor e textura:
+\begin{lstlisting}[style = xml]
+< model file = "..." ambiR="..." ambiG="..." ambiB="..."
+		   emisR="..." emisG="..." emisB="..."
+           specR="..." specG="..." specB="..."
+           diffR="..." diffG="..." diffB="..."
+		   texture="..." />
+\end{lstlisting}
+
+\section{Implementação}
+Para que a iluminação e a texturização sejam possíveis, é necessário adicionar as seguintes linhas de código à função main:
+
+\begin{lstlisting}[style = code]
+glEnableClientState(GL_VERTEX_ARRAY);
+glEnableClientState(GL_NORMAL_ARRAY);
+glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+glEnable(GL_LIGHTING);
+glEnable(GL_TEXTURE_2D);
+\end{lstlisting}
+
+Foram criados dois \emph{vectors}, um para armazenar as normais e outro para armazenar as coordenadas de textura.
+
+Estes vectors são preenchidos na função {$readXML\_aux$} ao percorrer os ficheiros .3d associados aos modelos, que contêm, para cada ponto, as suas coordenadas, as normais e as suas coordenadas de textura.
+
+Foram também criados mais dois buffers, um que armazena as normais e outro que armazena as coordenadas de textura.
+
+Ficamos então com três buffers na totalidade, que são gerados da seguinte forma:
+\begin{lstlisting}[style = code]
+glGenBuffers(3, buffers);
+glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+glBufferData(
+	GL_ARRAY_BUFFER, sizeof(float) * v.size(), v.data(), GL_STATIC_DRAW);
+
+glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+glBufferData(
+	GL_ARRAY_BUFFER, sizeof(float) * n.size(), n.data(), GL_STATIC_DRAW);
+
+glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+glBufferData(
+	GL_ARRAY_BUFFER, sizeof(float) * t.size(), t.data(), GL_STATIC_DRAW);
+\end{lstlisting}
+
+Estes buffers são depois ativados na função \emph{renderScene} da seguinte forma:
+\begin{lstlisting}[style = code]
+glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+glVertexPointer(3, GL_FLOAT, 0, 0);
+
+glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+glNormalPointer(GL_FLOAT, 0, 0);
+
+glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+glTexCoordPointer(2, GL_FLOAT, 0, 0);
+\end{lstlisting}
+
+\subsection{Luzes}
+Foram definidas duas \emph{structs} que armazenam as informações sobre as luzes. LIGHT é usada para os tipos POINT e DIRECTIONAL, enquanto SPOTLIGHT é usada para o tipo SPOT. A distinção entre POINT e DIRECTIONAL está no último argumento de pos (1.0 se for POINT e 0.0 se for DIRECTIONAL).
+
+\begin{lstlisting}[style = code]
+struct LIGHT {
+	int n; //number
+	float pos[4];
+};
+struct SPOTLIGHT {
+	int n; //number
+	float pos[4];
+	float cutoff[1];
+	float exponent[1];
+	float spotDir[3];
+};
+\end{lstlisting}
+
+Foram criados dois \emph{vectors} que armazenam as informações sobre as luzes.
+
+\begin{lstlisting}[style = code]
+vector<LIGHT> lights;
+vector<SPOTLIGHT> spotlights;
+\end{lstlisting}
+
+Na função recursiva {$readXML\_aux$}, que trata de percorrer o ficheiro xmlconfig, foi adicionado um caso para "lights" que trata de armazenar a informação sobre as luzes na estrutura de dados correspondente.
+
+As luzes são depois ativadas na \emph{renderScene} com recurso às funções glEnable e glLightfv do openGL.
+
+\subsection{Cores}
+Foram adicionadas as seguintes variáveis à struct FIGURE:
+\begin{lstlisting}[style = code]
+float dif[4];
+float amb[4];
+float emi[4];
+float spe[4];
+float shi;
+\end{lstlisting}
+
+Na função recursiva {$readXML\_aux$}, são adicionados à struct FIGURE correspondente os valores RBA das cores difusa, ambiente, emissiva, especular e brilho.
+No caso de não ter sido definida alguma das cores, o seu valor será o default do openGL.
+
+Estes valores são depois associados ao modelo na renderScene, com recurso à função glMaterialfv.
+
+\subsection{Texturas}
+Foi adicionada a seguinte variável à struct FIGURE:
+
+\begin{lstlisting}[style = code]
+GLuint texture;
+\end{lstlisting}
+
+Foi criada a função \emph{loadTexture} que recebe uma string como argumento e carrega e retorna a textura correpondente.
+
+Na função {$readXML\_aux$}, no caso de ser especificado um ficheiro de textura, esta é carregada com recurso à função \emph{loadTexture} e guardada na struct FIGURE correspondente.
+
+A textura será depois ativada na renderScene antes de desenhar cada modelo através de glBindTexture. No caso de não ter sido especificado um ficheiro de textura, glBindTexture receberá 0 como argumento o que corresponde a não desenhar textura.
+
+
+\chapter{Conclusão}
+
+Nesta última fase, o desenvolvimento faseado que o nosso grupo tem vindo a estabelecer termina, resultando num software com uma flexível configuração de novas \emph{features} em xml tirando partido do processamento que a API do OpenGL nos proporciona. Com isto queremos dizer que embora o resultado final seja muito importante, consideramos um bem maior o conseguir e conhecimento adquirido em cada uma das fases. O que deu uma oportunidade de aplicar os conceitos teóricos e comprovar o seu funcionamento através da formalização de código e algoritmos de geração de modelos, a implementação do movimento dos mesmos, as luzes, texturas,...
+
+Em forma de resumo podemos dizer que esta última fase revelou-se a mais enriquecedora do projeto, pois atribuiu lhe um aspeto visual próprio ao nosso Sistema Solar através da implementação de texturas próprias para cada planeta e a implantação/definição do Sol como a única fonte de luz emissiva de todo o sistema. Concluimos então que todos os objetivos para este projeto foram cumpridos na totalidade, no entanto, a nossa \emph{engine} ainda poderia continuar a sofre modificações e aprimorações para possibilitar a introdução de cada vez mais conceitos/funcionalidades novas.
+
+\end{document}
