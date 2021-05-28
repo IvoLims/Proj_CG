@@ -40,8 +40,8 @@ float px, vx, py, vy, pz, vz, alpha, beta, r;
 //FPS Mode Camera
 float dx, dy, dz;
 float radium = 17.0f;
-float speed = 0.05f;
-float rotateSpeed = 0.0008f;
+float speed = 0.8f;
+float rotateSpeed = 0.004f;
 //Activations
 bool fpsOn = false;
 bool first = true;
@@ -57,10 +57,6 @@ int window;
 int timebase;
 float frame;
 
-//Lights
-GLfloat dark[4] = { 0.2, 0.2, 0.2, 1.0 };
-GLfloat white[4] = { 0.8, 0.8, 0.8, 1.0 };
-
 //VBO
 GLuint buffers[3];
 vector<float> v; 
@@ -71,13 +67,14 @@ vector<float> t;
 struct FIGURE {
 	int beg;
 	int count;
+	GLfloat m[16];
+
 	float translation_time;
 	float catmull_points[10][3];
 	int catmull_points_size;
 	float rotation_time;
 	float rotation_coordinates[3];
 	int trans_or_rot;
-	GLfloat m[16];
 
 	float dif[4];
 	float amb[4];
@@ -85,7 +82,7 @@ struct FIGURE {
 	float spe[4];
 	float shi;
 
-	string texture;
+	GLuint texture;
 };
 vector<FIGURE> figures;
 
@@ -96,13 +93,23 @@ float rotation_time = 0;
 float rotation_coordinates[3];
 int trans_or_rot = -1;
 
+//Lights
+GLfloat dark[4] = { 0.2, 0.2, 0.2, 1.0 };
+GLfloat white[4] = { 0.8, 0.8, 0.8, 1.0 };
+struct LIGHT {
+	int n; //number
+	float pos[4];
+};
+struct SPOTLIGHT {
+	int n; //number
+	float pos[4];
+	float cutoff[1];
+	float exponent[1];
+	float spotDir[3];
+};
+vector<LIGHT> lights;
+vector<SPOTLIGHT> spotlights;
 int next_light = 0;
-
-void timer(int value) {
-	glutPostRedisplay();
-	glutTimerFunc(1, timer, 0);
-}
-
 
 void changeSize(int w, int h) {
 
@@ -145,7 +152,41 @@ void drawAxis() {
 	glVertex3f(0.0f, 0.0f, 1000.0f);
 	glVertex3f(0.0f, 0.0f, -1000.0f);
 	glEnd();
-	glColor3f(0.4f, 0.5f, 1.0f);
+	glColor3f(0.4f, 0.5f, 0.5f);
+}
+
+int loadTexture(std::string s) {
+
+	unsigned int t, tw, th;
+	unsigned char* texData;
+	unsigned int texID;
+
+	ilInit();
+	ilEnable(IL_ORIGIN_SET);
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+	ilGenImages(1, &t);
+	ilBindImage(t);
+	ilLoadImage((ILstring)s.c_str());
+	tw = ilGetInteger(IL_IMAGE_WIDTH);
+	th = ilGetInteger(IL_IMAGE_HEIGHT);
+	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+	texData = ilGetData();
+
+	glGenTextures(1, &texID);
+
+	glBindTexture(GL_TEXTURE_2D, texID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return texID;
 }
 
 void readXML_aux(XMLNode* node) {
@@ -211,45 +252,62 @@ void readXML_aux(XMLNode* node) {
 	}
 	else if (strcmp(value.c_str(), "lights") == 0) {
 		for (XMLElement* children = node_elem->FirstChildElement(); children != nullptr; children = children->NextSiblingElement()) {
-			if (children->Attribute("type") > 0) {
-				string type = children->Attribute("type");
-				if (type == "POINT" ) {
+			if (children->Attribute("type")) {
+				const char* type = children->Attribute("type");
+				if (strcmp(type, "POINT") == 0) {
 					x = children->DoubleAttribute("posX");
 					y = children->DoubleAttribute("posY");
 					z = children->DoubleAttribute("posZ");
-					float att = children->DoubleAttribute("att");
 					float pos[4] = { x, y, z, 1.0 };
-					glEnable(GL_LIGHT0 + next_light);
-					glLightfv(GL_LIGHT0 + next_light, GL_POSITION, pos);
-					//glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, att);
+					LIGHT point;
+					point.n = next_light;
+					for (int i = 0; i < 4; i++) {
+						point.pos[i] = pos[i];
+					}
+					lights.push_back(point);
 					next_light++;
 				}
-				else if (type == "DIRECTIONAL") {
+				else if (strcmp(type, "DIRECTIONAL") == 0) {
 					x = children->DoubleAttribute("dirX");
 					y = children->DoubleAttribute("dirY");
 					z = children->DoubleAttribute("dirZ");
 					float pos[4] = { x, y, z, 0.0 };
-					glEnable(GL_LIGHT0 + next_light);
-					glLightfv(GL_LIGHT0 + next_light, GL_POSITION, pos);
-					next_light++;					
+
+					LIGHT point;
+					point.n = next_light;
+					for (int i = 0; i < 4; i++) {						
+						point.pos[i] = pos[i];
+					}
+					lights.push_back(point);
+					next_light++;
 				}
-				else if (type == "SPOT") {
+				else if (strcmp(type, "SPOT") == 0) {
 					x = children->DoubleAttribute("posX");
 					y = children->DoubleAttribute("posY");
 					z = children->DoubleAttribute("posZ");
 					float dirX = children->DoubleAttribute("dirX");
 					float dirY = children->DoubleAttribute("dirY");
 					float dirZ = children->DoubleAttribute("dirZ");
-					float cutoff[] = { children->DoubleAttribute("cutoff") };
-					float exponent[] = { children->DoubleAttribute("exp") };
-					float att = children->DoubleAttribute("att");
-					float pos[4] = { x, y, z, 1.0 };
+					float cutoff[1] = { children->DoubleAttribute("cutoff") };
+					float exponent[1] = { children->DoubleAttribute("exponent") };
 					float spotDir[3] = { dirX, dirY, dirZ };
-					glEnable(GL_LIGHT0 + next_light);
-					glLightfv(GL_LIGHT0 + next_light, GL_POSITION, pos);
-					glLightfv(GL_LIGHT0 + next_light, GL_SPOT_DIRECTION, spotDir);
-					glLightfv(GL_LIGHT0 + next_light, GL_SPOT_CUTOFF, cutoff);
-					glLightfv(GL_LIGHT0 + next_light, GL_SPOT_EXPONENT, exponent);
+					float pos[4] = { x, y, z, 1.0 };
+
+					SPOTLIGHT point;
+					point.n = next_light;
+					for (int i = 0; i < 4; i++) {
+						point.pos[i] = pos[i];
+					}
+					for (int i = 0; i < 3; i++) {
+						point.spotDir[i] = spotDir[i];
+					}
+					if (cutoff[0] == 0) {
+						point.cutoff[0] = 180;
+					}
+					else { point.cutoff[0] = cutoff[0]; 
+					}
+					point.exponent[0] = exponent[0];
+					spotlights.push_back(point);
 					next_light++;
 				}
 			}
@@ -269,6 +327,8 @@ void readXML_aux(XMLNode* node) {
 			while (!file.eof()) {
 				for (int i = 0; i < 3 && !file.eof(); i++) {
 					v.push_back(stof(ch));
+					n.push_back(stof(ch));
+					t.push_back(stof(ch));
 					file >> ch;
 				}
 				//for (int i = 0; i < 3 && !file.eof(); i++){
@@ -306,14 +366,25 @@ void readXML_aux(XMLNode* node) {
 			new_figure.dif[1] = children->DoubleAttribute("diffG");
 			new_figure.dif[2] = children->DoubleAttribute("diffB");
 			new_figure.dif[3] = 1.0f;
+			if (new_figure.dif[0] + new_figure.dif[1] + new_figure.dif[2] == 0) {
+				new_figure.dif[0] = 0.8;
+				new_figure.dif[1] = 0.8;
+				new_figure.dif[2] = 0.8;
+			}
 			new_figure.amb[0] = children->DoubleAttribute("ambiR");
 			new_figure.amb[1] = children->DoubleAttribute("ambiG");
 			new_figure.amb[2] = children->DoubleAttribute("ambiB");
 			new_figure.amb[3] = 1.0;
+			if (new_figure.amb[0] + new_figure.amb[1] + new_figure.amb[2] == 0) {
+				new_figure.amb[0] = 0.2;
+				new_figure.amb[1] = 0.2;
+				new_figure.amb[2] = 0.2;
+			}
 			new_figure.emi[0] = children->DoubleAttribute("emisR");
 			new_figure.emi[1] = children->DoubleAttribute("emisG");
 			new_figure.emi[2] = children->DoubleAttribute("emisB");
 			new_figure.emi[3] = 1.0;
+
 			new_figure.spe[0] = children->DoubleAttribute("specR");
 			new_figure.spe[1] = children->DoubleAttribute("specG");
 			new_figure.spe[2] = children->DoubleAttribute("specB");
@@ -321,10 +392,12 @@ void readXML_aux(XMLNode* node) {
 			new_figure.shi = children->DoubleAttribute("shin");
 
 			//textures
-			new_figure.texture = children->DoubleAttribute("texture");	
+			new_figure.texture = 0;
+			if (children->Attribute("texture")) {
+				new_figure.texture = loadTexture(children->Attribute("texture"));
+			}
 
 			figures.push_back(new_figure);
-
 		}
 	}
 	if (node->NextSiblingElement() != nullptr) {
@@ -347,19 +420,19 @@ void readXML() {
 		node = node->FirstChildElement();
 	}
 	readXML_aux(node);
-	glGenBuffers(1, buffers);
+	glGenBuffers(3, buffers);
 	glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
 	glBufferData(
 		GL_ARRAY_BUFFER, sizeof(float) * v.size(), v.data(), GL_STATIC_DRAW);
 	
-	//glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
-	//glBufferData(
-	//	GL_ARRAY_BUFFER, sizeof(float) * n.size(), n.data(), GL_STATIC_DRAW);
-	/*
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+	glBufferData(
+		GL_ARRAY_BUFFER, sizeof(float) * n.size(), n.data(), GL_STATIC_DRAW);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
 	glBufferData(
 		GL_ARRAY_BUFFER, sizeof(float) * t.size(), t.data(), GL_STATIC_DRAW);
-	*/
+	
 }
 
 void multMatrixVector(float* m, float* v, float* res) {
@@ -464,17 +537,17 @@ void renderScene(void) {
 	}
 	gluLookAt(px, py, pz, vx, vy, vz, 0.0f, 1.0f, 0.0f);
 
-	// put drawing instructions here
-	drawAxis();
+	// put drawing instructions here	
 	glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
 	glVertexPointer(3, GL_FLOAT, 0, 0);
 
-	//glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
-	//glNormalPointer(GL_FLOAT, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+	glNormalPointer(GL_FLOAT, 0, 0);
 
-	//glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
-	//glTexCoordPointer(2, GL_FLOAT, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+	glTexCoordPointer(2, GL_FLOAT, 0, 0);
 
+	//figures
 	for (int i = 0; i < figures.size(); i++) {
 		glPushMatrix();
 		if (figures[i].trans_or_rot == 1 || figures[i].trans_or_rot == 0) {
@@ -502,16 +575,33 @@ void renderScene(void) {
 
 		glMultMatrixf(figures[i].m);
 		
-		if (strcmp(figures[i].texture.c_str(), "") != 0) {
-			loadTexture(figures[i].texture);
-		}
-
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, figures[i].dif);
-		glMaterialfv(GL_FRONT, GL_AMBIENT, dark);
-		glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-		glMaterialf(GL_FRONT, GL_SHININESS, 128);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, figures[i].amb);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, figures[i].spe);
+		glMaterialfv(GL_FRONT, GL_EMISSION, figures[i].emi);
+		glMaterialf(GL_FRONT, GL_SHININESS, figures[i].shi);
+		
+		glBindTexture(GL_TEXTURE_2D, figures[i].texture);
+
 		glDrawArrays(GL_TRIANGLES, figures[i].beg, figures[i].count);
 		glPopMatrix();
+	}
+
+	//lights 
+	for (int i = 0; i < lights.size(); i++) {
+		glEnable(GL_LIGHT0 + lights[i].n);
+		glLightfv(GL_LIGHT0 + lights[i].n, GL_POSITION, lights[i].pos);
+
+	}
+	
+	//spotlights
+	for (int i = 0; i < spotlights.size(); i++) {
+		glEnable(GL_LIGHT0 + spotlights[i].n);
+		glLightfv(GL_LIGHT0 + spotlights[i].n, GL_POSITION, spotlights[i].pos);
+		glLightfv(GL_LIGHT0 + spotlights[i].n, GL_SPOT_DIRECTION, spotlights[i].spotDir);
+		glLightfv(GL_LIGHT0 + spotlights[i].n, GL_SPOT_CUTOFF, spotlights[i].cutoff);
+		glLightfv(GL_LIGHT0 + spotlights[i].n, GL_SPOT_EXPONENT, spotlights[i].exponent);
+		
 	}
 	//FPS counter
 	frame++;
@@ -641,7 +731,6 @@ int main(int argc, char** argv) {
 	glutInitWindowSize(800, 800);
 	window = glutCreateWindow("Window");
 
-
 	glewInit();
 	readXML();
 
@@ -660,13 +749,17 @@ int main(int argc, char** argv) {
 	glutMotionFunc(mouseM);
 
 	//  OpenGL settings
-	glEnable(GL_LIGHTING);
-
-	glEnableClientState(GL_VERTEX_ARRAY);
+	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT, GL_LINE);
+	//glPolygonMode(GL_FRONT, GL_LINE);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	
 	// enter GLUT's main cycle
 	glutMainLoop();
 
