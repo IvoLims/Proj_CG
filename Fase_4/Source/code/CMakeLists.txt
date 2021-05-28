@@ -48,6 +48,7 @@ if  (WIN32)
 	if (NOT EXISTS "${FIGTEX_FOLDER}" OR NOT EXISTS "${FIGTEX_FOLDER}")
 		message(ERROR ": TEXTURES not found")
 	endif (NOT EXISTS "${FIGTEX_FOLDER}" OR NOT EXISTS "${FIGTEX_FOLDER}")
+
 	
 	include_directories(${TOOLKITS_FOLDER}/glut ${TOOLKITS_FOLDER}/glew ${TOOLKITS_FOLDER}/devil ${XML_FOLDER} ${FIGTEX_FOLDER})
 	target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} 
@@ -66,23 +67,9 @@ if  (WIN32)
 	endif(EXISTS "${XML_FOLDER}")
 
 	if (EXISTS "${FIGTEX_FOLDER}")
-	    file(COPY ${FIGTEX_FOLDER}/textures/earthmap1k.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/textures/jupiter2_1k.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/textures/mars_1k_color.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/textures/mercurymap.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/textures/moonmap1k.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/textures/neptunemap.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/textures/saturnmap.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/textures/saturnringcolor.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/textures/sunmap.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/textures/uranusmap.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/textures/uranusringcolour.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/textures/venusmap.jpg DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/figs/ring.3d DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/figs/sphere.3d DESTINATION ${CMAKE_BINARY_DIR})
-	    file(COPY ${FIGTEX_FOLDER}/figs/teapot.3d DESTINATION ${CMAKE_BINARY_DIR})
+	    file(COPY ${FIGTEX_FOLDER}/textures/ DESTINATION ${CMAKE_BINARY_DIR})
+	    file(COPY ${FIGTEX_FOLDER}/figs/ DESTINATION ${CMAKE_BINARY_DIR})
 	endif(EXISTS "${FIGTEX_FOLDER}")
-
 	
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 	
