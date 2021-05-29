@@ -94,36 +94,7 @@ string gen_Box(float x,float y,float z){
 
 }
 
-string gen_Sphere(float radius,int slices,int stacks){
-    float a_interval = 2 * M_PI / slices;
-    float b_interval = M_PI / stacks;
-    float next_a, next_b;
-    stringstream ss;
-
-    for (float a = 0; a < 2 * M_PI; a +=  a_interval) {
-        for (float b = -M_PI/2; b < M_PI/2; b += b_interval) {
-            next_a = a + a_interval;
-            next_b = b + b_interval;
-            if (next_a > 2 * M_PI) {
-                next_a = 2 * M_PI;
-            }
-            if (next_b > M_PI / 2) {
-                next_b = M_PI / 2;
-            }
-            ss << radius * cos(next_b) * sin(next_a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(next_a) << "\n";
-            ss << radius * cos(next_b) * sin(a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(a) << "\n";
-            ss << radius * cos(b) * sin(next_a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(next_a) << "\n";
-
-            ss << radius * cos(b) * sin(next_a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(next_a) << "\n";
-            ss << radius * cos(next_b) * sin(a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(a) << "\n";
-            ss << radius * cos(b) * sin(a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(a) << "\n";
-
-        }
-    }
-    return ss.str();
-}
-
-string prepareSphere(float radius, int slices, int stacks) {
+string gen_Sphere(float radius, int slices, int stacks) {
 
 	vector <float> v;
 	vector <float> n;
@@ -138,7 +109,7 @@ string prepareSphere(float radius, int slices, int stacks) {
 	float pi_div_2 = M_PI / 2;
 	float pi_mul_2 = 2 * M_PI;
 
-  stringstream ss;
+        stringstream ss;
 
 	for (float a = 0; a < 2 * M_PI; a += a_interval) {
 		for (float b = -M_PI / 2; b < M_PI / 2; b += b_interval) {
@@ -151,21 +122,21 @@ string prepareSphere(float radius, int slices, int stacks) {
 				next_b = M_PI / 2;
 			}
 
-      ss << radius * cos(next_b) * sin(next_a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(next_a) << " "
-      << (radius * cos(next_b) * sin(next_a))/radius << " " << (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
-      << next_a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
+                        ss << radius * cos(next_b) * sin(next_a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(next_a) << " "
+                        << (radius * cos(next_b) * sin(next_a))/radius << " " << (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+                        << next_a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
 
-      ss << radius * cos(next_b) * sin(a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(a) << " "
-      << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
-      << a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
+                        ss << radius * cos(next_b) * sin(a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(a) << " "
+                        << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+                        << a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
 
-      ss << radius * cos(b) * sin(next_a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(next_a) << " "
-      << (radius * cos(next_b) * sin(next_a))/radius << " " << (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
-      << next_a / pi_mul_2 << " " << (b + pi_div_2) / M_PI << "\n";
+                        ss << radius * cos(b) * sin(next_a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(next_a) << " "
+                        << (radius * cos(next_b) * sin(next_a))/radius << " " << (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+                        << next_a / pi_mul_2 << " " << (b + pi_div_2) / M_PI << "\n";
 
 			ss << radius * cos(b) * sin(next_a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(next_a) << " "
 			<< (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
-      << next_a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
+                        << next_a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
 
 			ss << radius * cos(next_b) * sin(a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(a) << " "
 			<< (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
@@ -176,9 +147,9 @@ string prepareSphere(float radius, int slices, int stacks) {
 			<< a / pi_mul_2 << " " << (b + pi_div_2) / M_PI << "\n";
 
 			vertex += 6;
-		}
+		        }
 	}
-    return ss.str();
+        return ss.str();
 }
 
 
