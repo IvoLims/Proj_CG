@@ -177,8 +177,9 @@ string prepareSphere(float radius, int slices, int stacks) {
 
 			vertex += 6;
 		}
-    return ss.str();
 	}
+    return ss.str();
+}
 
 
 
