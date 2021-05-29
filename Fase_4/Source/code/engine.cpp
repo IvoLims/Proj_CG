@@ -40,7 +40,7 @@ float px, vx, py, vy, pz, vz, alpha, beta, r;
 //FPS Mode Camera
 float dx, dy, dz;
 float radium = 17.0f;
-float speed = 0.8f;
+float speed = 0.4f;
 float rotateSpeed = 0.004f;
 //Activations
 bool fpsOn = false;
@@ -326,19 +326,17 @@ void readXML_aux(XMLNode* node) {
 			file >> ch;
 			while (!file.eof()) {
 				for (int i = 0; i < 3 && !file.eof(); i++) {
-					v.push_back(stof(ch));
+					v.push_back(stof(ch));					
+					file >> ch;
+				}
+				for (int i = 0; i < 3 && !file.eof(); i++){
 					n.push_back(stof(ch));
+					file >> ch;
+				}
+				for (int i = 0; i < 2 && !file.eof(); i++){
 					t.push_back(stof(ch));
 					file >> ch;
 				}
-				//for (int i = 0; i < 3 && !file.eof(); i++){
-				//	n.push_back(stof(ch));
-				//	file >> ch;
-				// }
-				//for (int i = 0; i < 2 && !file.eof(); i++)
-				//	t.push_back(stof(ch));
-				//	file >> ch;
-				// }
 				model_size++;
 			}
 			file.close();
@@ -694,7 +692,7 @@ void onKeyDown(int key, int x, int y) {
 	case GLUT_KEY_HOME: {
 		fpsOn = !fpsOn;
 		first = false;
-		r = sqrt(pow(px, 2) + pow(py, 2) + pow(pz, 2));
+		//r = sqrt(pow(px, 2) + pow(py, 2) + pow(pz, 2));
 		break;
 	}
 	default: {
