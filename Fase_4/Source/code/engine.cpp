@@ -692,7 +692,7 @@ void onKeyDown(int key, int x, int y) {
 	case GLUT_KEY_HOME: {
 		fpsOn = !fpsOn;
 		first = false;
-		//r = sqrt(pow(px, 2) + pow(py, 2) + pow(pz, 2));
+		r = sqrt(pow(px, 2) + pow(py, 2) + pow(pz, 2));
 		break;
 	}
 	default: {
