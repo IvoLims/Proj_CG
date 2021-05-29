@@ -66,8 +66,34 @@
   title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
 }
 
+\lstdefinestyle{cmake}{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{white},      % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1000,                % start line enumeration with line 1
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=MAKE,                    % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
 \title{Computação Gráfica (3º ano de Curso)\\
-       \textbf{Fase 3}\\ Relatório de Desenvolvimento
+       \textbf{Fase 4}\\ Relatório de Desenvolvimento
        } %Titulo do documento
 %\title{Um Exemplo de Artigo em \LaTeX}
 \author{Diogo Fernandes\\ (A87968) \and Luís Guimarães\\ (A87947)
@@ -89,32 +115,26 @@
 \tableofcontents % insere Indice
 
 \chapter{Introdução}
-Uma vez que esta é a última fase foi pedido uma serie de novas implementações, foi introduzido ao \emph{generator} as coordenadas de textura e as respetivas normais de cada vértice das primitivas feitas  na primeira fase. 
+Uma vez que esta é a última fase foi pedido uma série de novas implementações. O \emph{generator} passou a gerar, para além das coordenadas dos pontos, as normais e as as coordenadas de textura. 
 
-Para conseguirmos tirar partido dessa nova informação incluída nos modelos 3D, tivemos de ativar as luzes no OpenGL e definir as propriedades de cada modelo, para assim utilizarmos este novo tipo de coloração.
-
-Tais exigências obrigaram à reformulação da criação dos modelos, no \emph{generator}, acrescentando a cada ficheiro gerado os índices dos respetivos vértices para que posteriormente, na \emph{engine}, os modelos passem a ser desenhados utilizando o buffering dos índices.
+Para conseguirmos tirar partido dessa nova informação incluída nos modelos 3D, tivemos de ativar as luzes e as texturas no OpenGL e definir as propriedades de cada modelo, para assim utilizarmos este novo tipo de coloração.
 
 Posto isto, estabelecemos um conjunto de tarefas que incidiram tanto sobre o \emph{generator} como a \emph{engine} para que esta possa suportar os requisitos indicados no enunciado e outros definidos por nós:
 
 {\bfseries Atualizações no \emph{generator}:}
 \begin{enumerate} 
-\item Alterar a geração de todos os modelos introduzindo os índices no ficheiro gerado;
-\item Aplicar algoritmos para gerar as coordenadas de textura e as normais dos modelos atualizados;
+\item Gerar as normais e as coordenadas de textura dos modelos atualizados;
 \end{enumerate}
 
 {\bfseries Atualizações na \emph{engine}:}
 \begin{enumerate} 
-\item Alterar o processamento dos vértices até agora utilizado, passando de VBOs (sem índices) para VBOs (com índices);
-\item Atualizar o parser de modo a dar suporte aos novos tipos de configuração xml e criar estruturas em memória para guardar as propriedades das luzes e materiais,...;
+\item Atualizar o parser de modo a dar suporte aos novos tipos de configuração xml e atualizar/criar estruturas de dados para guardar as propriedades das luzes, materiais e texturas;
 \item Introduzir uma câmara fps, assim como outras features para facilitar o debug/visualização do ambiente;
 \end{enumerate}
 \chapter{Atualização do \emph{generator}}
-\section{Breves pensamentos}
-Com a introdução desta última fase, percebemos que a criação das coordenadas de textura e as normais para cada vértice, a memória e o posterior carregamento dos dados no \emph{engine} utilizando a estratégia adotada até agora, não seria uma ideia muito boa em termos de custo computacional para a nossa aplicação. Portanto resolvemos implementar uma otimização na criação dos modelos sem a repetição dos vértices.
 \section{Nova configuração de geração de modelos}
 
-Posto isto segue-se uma breve descrição daquilo que foi alterado tanto a nível dos algoritmos dos modelos como a geração das normais, coordenadas de textura, entre outros.
+Segue-se uma breve descrição daquilo que foi alterado tanto a nível dos algoritmos dos modelos como a geração das normais, coordenadas de textura, entre outros.
 
 \chapter{Atualização da \emph{engine}}
 
@@ -129,9 +149,10 @@ As \textbf{\emph{spotlight}} simulam uma luz parecida aquela vinda de uma lanter
 <lights>
     <light type="SPOT" posX="..." posY="..." posZ="..."
                        dirX="..." dirY="..." dirZ="..."
-                       cutoff="4" exponent="100" />
+                       cutoff="..." exponent="..." />
 <lights>
 \end{lstlisting}
+
 No caso das luzes de tipo \textbf{ \emph{point}} que são definidas num ponto e emitem em todas as direções. Terá a seguinte definição:
 
 \begin{lstlisting}[style = xml]
@@ -139,23 +160,200 @@ No caso das luzes de tipo \textbf{ \emph{point}} que são definidas num ponto e 
     <light type="POINT" posX="..." posY="..." posZ="..." />
 </lights>
 \end{lstlisting}
+
 Já as \textbf{\emph{directional}} \emph{lights} não estão definidas num ponto pois seguem uma dada direção.
 \begin{lstlisting}[style = xml]
 <lights>
-   <light type="DIRECTIONAL" posX="..." posY="..." posZ="..." />
+   <light type="DIRECTIONAL" dirX="..." dirY="..." dirZ="..." />
 </lights>
 \end{lstlisting}
-Para todos os tipos de luzes enunciados a cima podem especificar a intensidade RGBA das luzes no que toca à componente difusa, ambiente e especular, assim:
+
+\iffalse 
+Para todos os tipos de luzes enunciados a cima podem especificar a intensidade RGB das luzes no que toca à componente difusa, ambiente e especular, assim:
 \begin{lstlisting}[style = xml]
 <light ... ambiR="..." ambiG="..." ambiB="..."
            specR="..." specG="..." specB="..."
-           diffR="..." diffG="..." diffB="..." />
+     diffR="..." diffG="..." diffB="..." />
 \end{lstlisting}
+\fi
+
+Os modelos passam a ser desenhados com cor, sendo possível especificar cada tipo de cor no modelo RGB:
+\begin{lstlisting}[style = xml]
+< model file = "..." ambiR="..." ambiG="..." ambiB="..."
+		                 emisR="..." emisG="..." emisB="..."
+                     specR="..." specG="..." specB="..."
+                     diffR="..." diffG="..." diffB="..." />
+\end{lstlisting}
+
+Podem também ser desenhados modelos com uma determinada textura:
+\begin{lstlisting}[style = xml]
+< model file = "..." texture="..." />
+\end{lstlisting}
+
+Ou com cor e textura:
+\begin{lstlisting}[style = xml]
+< model file = "..." ambiR="..." ambiG="..." ambiB="..."
+		                 emisR="..." emisG="..." emisB="..."
+                     specR="..." specG="..." specB="..."
+                     diffR="..." diffG="..." diffB="..."
+                     texture="..." />
+\end{lstlisting}
+
+\section{Implementação}
+Para que a iluminação e a texturização sejam possíveis, é necessário adicionar as seguintes linhas de código à função main:
+
+\begin{lstlisting}[style = code]
+glEnableClientState(GL_VERTEX_ARRAY);
+glEnableClientState(GL_NORMAL_ARRAY);
+glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+glEnable(GL_LIGHTING);
+glEnable(GL_TEXTURE_2D);
+\end{lstlisting}
+
+Foram criados dois \emph{vectors}, um para armazenar as normais e outro para armazenar as coordenadas de textura.
+
+Estes vectors são preenchidos na função {$readXML\_aux$} ao percorrer os ficheiros \emph{xxx.3d} associados aos modelos, que contêm, para cada ponto, as suas coordenadas, as normais e as suas coordenadas de textura.
+
+Foram também criados mais dois buffers, um que armazena as normais e outro que armazena as coordenadas de textura.
+\newpage
+Ficamos então com três buffers na totalidade, que são gerados da seguinte forma:
+\begin{lstlisting}[style = code]
+glGenBuffers(3, buffers);
+glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+glBufferData(
+	GL_ARRAY_BUFFER, sizeof(float) * v.size(), v.data(), GL_STATIC_DRAW);
+
+glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+glBufferData(
+	GL_ARRAY_BUFFER, sizeof(float) * n.size(), n.data(), GL_STATIC_DRAW);
+
+glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+glBufferData(
+	GL_ARRAY_BUFFER, sizeof(float) * t.size(), t.data(), GL_STATIC_DRAW);
+\end{lstlisting}
+
+Estes buffers são depois ativados na função \emph{renderScene} da seguinte forma:
+\begin{lstlisting}[style = code]
+glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+glVertexPointer(3, GL_FLOAT, 0, 0);
+
+glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+glNormalPointer(GL_FLOAT, 0, 0);
+
+glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+glTexCoordPointer(2, GL_FLOAT, 0, 0);
+\end{lstlisting}
+
+\subsection{Luzes}
+Foram definidas duas \emph{structs} que armazenam as informações sobre as luzes. LIGHT é usada para os tipos POINT e DIRECTIONAL, enquanto SPOTLIGHT é usada para o tipo SPOT. A distinção entre POINT e DIRECTIONAL está no último argumento de pos (1.0 se for POINT e 0.0 se for DIRECTIONAL).
+
+\begin{lstlisting}[style = code]
+struct LIGHT {
+	 int n; //number
+	 float pos[4];
+};
+struct SPOTLIGHT {
+	 int n; //number
+	 float pos[4];
+	 float cutoff[1];
+	 float exponent[1];
+	 float spotDir[3]; };
+\end{lstlisting}
+
+Foram criados dois \emph{vectors} que armazenam as informações sobre as luzes.
+
+\begin{lstlisting}[style = code]
+vector<LIGHT> lights;
+vector<SPOTLIGHT> spotlights;
+\end{lstlisting}
+
+Na função recursiva {$readXML\_aux$}, que trata de percorrer o ficheiro xmlconfig, foi adicionado um caso para "lights" que trata de armazenar a informação sobre as luzes na estrutura de dados correspondente.
+
+As luzes são depois ativadas na \emph{renderScene} com recurso às funções glEnable e glLightfv do openGL.
+
+\subsection{Cores}
+Foram adicionadas as seguintes variáveis à struct FIGURE:
+\begin{lstlisting}[style = code]
+float dif[4];
+float amb[4];
+float emi[4];
+float spe[4];
+float shi;
+\end{lstlisting}
+
+Na função recursiva {$readXML\_aux$}, são adicionados à struct FIGURE correspondente os valores RBA das cores difusa, ambiente, emissiva, especular e brilho.
+No caso de não ter sido definida alguma das cores, o seu valor será o default do openGL.
+
+Estes valores são depois associados ao modelo na renderScene, com recurso à função glMaterialfv.
+
+\subsection{Texturas}
+Foi adicionada a seguinte variável à struct FIGURE:
+
+\begin{lstlisting}[style = code]
+GLuint texture;
+\end{lstlisting}
+
+Foi criada a função \emph{loadTexture} que recebe uma string como argumento e carrega e retorna a textura correpondente.
+
+Na função {$readXML\_aux$}, no caso de ser especificado um ficheiro de textura, esta é carregada com recurso à função \emph{loadTexture} e guardada na struct FIGURE correspondente.
+
+A textura será depois ativada na renderScene antes de desenhar cada modelo através de glBindTexture. No caso de não ter sido especificado um ficheiro de textura, glBindTexture receberá 0 como argumento o que corresponde a não desenhar textura.
+
+\section{Outras implementações}
+
+\subsection{CMakeLists}
+
+Uma vez que o nosso projeto começou a crescer e quantidade de \emph{features} que o mesmo deve permitir fazer também resolvemos gastar um pouco do nosso tempo a atualizar o \emph{CMakeList}. 
+
+Para além da óbvia verificação e cópia da \emph{DevIL.lib} da pasta \emph{TOOLKITS\_FOLDER} resolvemos anular o trabalho de toda a vez que faziamos o \emph{Configure} e \emph{Generate} no programa \emph{CMake} ter de inserir manualmente na pasta \emph{build} os ficheiros com as figuras do tipo \emph{xxx.3d}, as texturas com a assinatura \emph{xxx.jpg} e ainda o \emph{xmlconf.xml}. Portanto por questões de organização esses ficheiro devem estar em pastas para que as suas diretivas possam ser passadas ao programa, a nova pasta \emph{FIGTEX\_FOLDER} deverá conter duas subpastas a \emph{textures} bem como a \emph{figs}, já o \emph{XML\_FOLDER} precisará conter uma subpasta \emph{config} com um ficheiro nomeado de \emph{xmlconf.xml}.
+\begin{lstlisting}[style = cmake]
+
+...
+
+message(STATUS "Xml_DIR set to: " ${XML_FOLDER})
+set(XML_FOLDER "" CACHE PATH "Path to XML folder")
+
+message(STATUS "FigTex_DIR set to: " ${FIGTEX_FOLDER})
+set(FIGTEX_FOLDER "" CACHE PATH "Path to FIGTEX folder")
+
+...
+
+if (EXISTS "${XML_FOLDER}")
+		file(COPY ${XML_FOLDER}/config/xmlconf.xml DESTINATION ${CMAKE_BINARY_DIR})
+endif(EXISTS "${XML_FOLDER}")
+
+if (EXISTS "${FIGTEX_FOLDER}")
+	    file(COPY ${FIGTEX_FOLDER}/textures/ DESTINATION ${CMAKE_BINARY_DIR})
+	    file(COPY ${FIGTEX_FOLDER}/figs/ DESTINATION ${CMAKE_BINARY_DIR})
+endif(EXISTS "${FIGTEX_FOLDER}")
+
+\end{lstlisting}
+
+O código escrito pede as diretivas das pastas para que possa copiar todos os ficheiros das suas subpastas e os cole na \emph{CMAKE\_BINARY\_DIR} que é a pasta \emph{build} gerada pelo \emph{CMake}.
+\newpage
+\subsection{Câmara fps}
+
+Embora este não seja um dos aspetos mais importantes do trabalho resolvemos dedicar uns parágrafos à nossa implementação de uma câmara \emph{fps}.
+
+O raciocínio passa por considerar que a câmara possui uma posição \emph{P} e um ponto para onde está a olhar e através desse conhecimento, criar o vetor da direção para onde a mesma está a olhar. Com esse vetor podemos reproduzir o movimento para a frente e para trás ( teclas $\uparrow$ e $\downarrow$ ) relativamente à direção do olhar.
+
+Já o movimento lateral pode ser obtido calculando o vetor resultante do up com a direção do olhar multiplicando o resultado por -1 ou 1 caso seja para a esquerda ou direita ( teclas $\leftarrow$ e $\rightarrow$ ).
+
+A mesma também consegue olhar à sua volta, para cima/baixo utilizando os ângulo alfa e beta para definir a posição do olhar com coordenadas esféricas ( movimento de \emph{drag} com o rato ).
+
+As variáveis de controlo da câmara bem como a sua aplicação encontra-se definida em na \emph{engine.cpp}.
+
+\chapter{Resultado Final}
+
+Nesta última fase conseguimos juntar tudo o que aprendemos o que culminou na criação da seguinte demonstração:
+
+Imagem do Sistema Solar Final.
 
 \chapter{Conclusão}
 
 Nesta última fase, o desenvolvimento faseado que o nosso grupo tem vindo a estabelecer termina, resultando num software com uma flexível configuração de novas \emph{features} em xml tirando partido do processamento que a API do OpenGL nos proporciona. Com isto queremos dizer que embora o resultado final seja muito importante, consideramos um bem maior o conseguir e conhecimento adquirido em cada uma das fases. O que deu uma oportunidade de aplicar os conceitos teóricos e comprovar o seu funcionamento através da formalização de código e algoritmos de geração de modelos, a implementação do movimento dos mesmos, as luzes, texturas,...
 
-Em forma de resumo podemos dizer que esta última fase revelou-se a mais enriquecedora do projeto, pois atribuiu lhe um aspeto visual próprio ao nosso Sistema Solar através da implementação de texturas próprias para cada planeta e a implantação/definição do Sol como a única fonte de luz emissiva de todo o sistema. Concluimos então que todos os objetivos para este projeto foram cumpridos na totalidade e deu-nos a precessão de que se quiséssemos a nossa \emph{engine} ainda poderia continuar a sofre modificações e aprimorações para possibilitar a introdução de cada vez mais conceitos/funcionalidades  novas.
+Em forma de resumo podemos dizer que esta última fase revelou-se a mais enriquecedora do projeto, pois atribuiu lhe um aspeto visual próprio ao nosso Sistema Solar através da implementação de texturas próprias para cada planeta e a implantação/definição do Sol como a única fonte de luz emissiva de todo o sistema. Concluimos então que todos os objetivos para este projeto foram cumpridos na totalidade, no entanto, a nossa \emph{engine} ainda poderia continuar a sofre modificações e aprimorações para possibilitar a introdução de cada vez mais conceitos/funcionalidades novas.
 
 \end{document}
