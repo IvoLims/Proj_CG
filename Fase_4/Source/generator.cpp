@@ -296,10 +296,11 @@ int main(int argc, char* argv[]){
     }
     if(fig == "plane"){
        if(argc < 3){
-                cout << "\nError! Invalid number of arguments.\n";
-                exit(1);
-       } fname = argv[2];
-       res = gen_Plane(PLANE_WIDTH);
+          cout << "\nError! Invalid number of arguments.\n";
+          exit(1);
+       } 
+	  fname = argv[2];
+          res = gen_Plane(PLANE_WIDTH);
     } else if(fig == "box"){
               if(argc < 6){
                  cout << "\nError! Invalid number of arguments.\n";
@@ -341,13 +342,13 @@ int main(int argc, char* argv[]){
               fname = argv[4];
               res = gen_Bezier(patch,tesselation);
     } else if(fig == "info"){
-            cout << "\nplane: generator plane <outfile>\n";
-            cout << "\nbox: generator box <X> <Y> <Z> <outfile>\n";
-            cout << "\nsphere: generator sphere <radius> <slices> <stacks> <outfile>\n";
-            cout << "\ncone: generator cone <radius> <height> <slices> <stacks> <outfile>.\n";
-            cout << "\nbezier: generator bezier <in-file> <tessellation-level> <outfile>.\n";
+              cout << "\nplane: generator plane <outfile>\n";
+              cout << "\nbox: generator box <X> <Y> <Z> <outfile>\n";
+              cout << "\nsphere: generator sphere <radius> <slices> <stacks> <outfile>\n";
+              cout << "\ncone: generator cone <radius> <height> <slices> <stacks> <outfile>.\n";
+              cout << "\nbezier: generator bezier <in-file> <tessellation-level> <outfile>.\n";
     } else {
-            cout << "\nError! That feature doesn't exist.\n";
+              cout << "\nError! That feature doesn't exist.\n";
     }
         // Fazer a criação do ficheiro:
         constructF(res,fname);
