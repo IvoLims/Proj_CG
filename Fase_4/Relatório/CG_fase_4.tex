@@ -364,14 +364,39 @@ Nesta figura os cálculos ficaram da seguinte maneira:
 Por fim foi adicionado o seguinte:
 \begin{multicols}{2}
 \begin{lstlisting}[style = code]
-blah
+       ...
+      << 0 << " " << -1 << " " << 0 << " "
+      << 1/6 << " " << 1/6 << "\n";
+       ...
+      << 0 << " " << -1 << " " << 0 << " "
+      << 1/6 * sin(next_a) << " " << 1/6 * cos(next_a) << "\n";
+       ...
+      << 0 << " " << -1 << " " << 0 << " "
+      << 1/6 * sin(a) << " " << 1/6 * cos(a) << "\n";
+      ...
+
+       ...
+      << cos(atan(radius/height))*cos(next_a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(next_a) << " "
+      << sin(next_a) * ((height - next_h) / height) * cos(next_a)  << " " << next_h/height << "\n";
+       ...
+      << cos(atan(radius/height))*cos(a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(a) << " "
+      << sin(a) * ((height - next_h) / height) * cos(a)  << " " << next_h/height << "\n";
+       ...
+      << cos(atan(radius/height))*cos(next_a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(next_a) << " "
+      << sin(next_a) * ((height - next_h) / height) * cos(next_a)  << " " << next_h/height << "\n";
+
+       ...
+      << cos(atan(radius/height))*cos(a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(a) << " "
+      << sin(a) * ((height - next_h) / height) * cos(a)  << " " << next_h/height << "\n";
+       ...
+      << cos(atan(radius/height))*cos(a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(a) << " "
+      << sin(a) * ((height - next_h) / height) * cos(a)  << " " << next_h/height << "\n";
+       ...
+      << cos(atan(radius/height))*cos(next_a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(next_a) << " "
+      << sin(next_a) * ((height - next_h) / height) * cos(next_a)  << " " << next_h/height << "\n";  
 \end{lstlisting}
 \end{multicols}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.7\textwidth]{sphere.png}
-\end{figure}
 \chapter{Atualização da \emph{engine}}
 
 \section{Nova configuração do xml}
@@ -584,7 +609,10 @@ As variáveis de controlo da câmara bem como a sua aplicação encontra-se defi
 
 Conseguimos portanto nesta última fase juntar tudo o que aprendemos o que culminou na criação deste magnífico Sistema Solar.
 
-Imagem do Sistema Solar Final.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.0\textwidth]{sistema_solar.png}
+\end{figure}
 
 \chapter{Conclusão}
 
