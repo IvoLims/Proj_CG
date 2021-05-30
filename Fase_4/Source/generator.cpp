@@ -5,7 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <stdio.h>
-#include <bits/stdc++.h>
+#include  <bits/stdc++.h>
 
 #define _USE_MATH_DEFINES
 #define PLANE_WIDTH 4
@@ -41,44 +41,44 @@ string preparePlane(float width){
   stringstream ss;
 
   ss << width << " " << 0 << " " << width << " "
-     << 0 << " " << 1 << " " << 0 << " "
-     << 1 << " " << 0 << "\n";
+  << 0 << " " << 1 << " " << 0 << " "
+  << 1 << " " << 0 << "\n";
   ss << width << " " << 0 << " " << -width << " "
-     << 0 << " " << 1 << " " << 0 << " "
-     << 1 << " " << 1 << "\n";
+  << 0 << " " << 1 << " " << 0 << " "
+  << 1 << " " << 1 << "\n";
   ss << -width << " " << 0 << " " << -width << " "
-     << 0 << " " << 1 << " " << 0 << " "
-     << 0 << " " << 1 << "\n";
+  << 0 << " " << 1 << " " << 0 << " "
+  << 0 << " " << 1 << "\n";
 
   ss << width << " " << 0 << " " << width << " "
-     << 0 << " " << 1 << " " << 0 << " "
-     << 1 << " " << 0 << "\n";
+  << 0 << " " << 1 << " " << 0 << " "
+  << 1 << " " << 0 << "\n";
   ss << -width << " " << 0 << " " << -width << " "
-     << 0 << " " << 1 << " " << 0 << " "
-     << 0 << " " << 1 << "\n";
+  << 0 << " " << 1 << " " << 0 << " "
+  << 0 << " " << 1 << "\n";
   ss << -width << " " << 0 << " " << width << " "
-     << 0 << " " << 1 << " " << 0 << " "
-     << 0 << " " << 0 << "\n";
+  << 0 << " " << 1 << " " << 0 << " "
+  << 0 << " " << 0 << "\n";
 
   ss << width << " " << 0 << " " << -width << " "
-     << 0 << " " << -1 << " " << 0 << " "
-     << 1 << " " << 1 << "\n";
+  << 0 << " " << -1 << " " << 0 << " "
+  << 1 << " " << 1 << "\n";
   ss << width << " " << 0 << " " << width << " "
-     << 0 << " " << -1 << " " << 0 << " "
-     << 1 << " " << 0 << "\n";
+  << 0 << " " << -1 << " " << 0 << " "
+  << 1 << " " << 0 << "\n";
   ss << -width << " " << 0 << " " << -width << " "
-     << 0 << " " << -1 << " " << 0 << " "
-     << 0 << " " << 1 << "\n";
+  << 0 << " " << -1 << " " << 0 << " "
+  << 0 << " " << 1 << "\n";
 
   ss << -width << " " << 0 << " " << -width << " "
-     << 0 << " " << -1 << " " << 0 << " "
-     << 0 << " " << 1 << "\n";
+  << 0 << " " << -1 << " " << 0 << " "
+  << 0 << " " << 1 << "\n";
   ss << width << " " << 0 << " " << width << " "
-     << 0 << " " << -1 << " " << 0 << " "
-     << 1 << " " << 0 << "\n";
+  << 0 << " " << -1 << " " << 0 << " "
+  << 1 << " " << 0 << "\n";
   ss << -width << " " << 0 << " " << width << " "
-     << 0 << " " << -1 << " " << 0 << " "
-     << 0 << " " << 0 << "\n";
+  << 0 << " " << -1 << " " << 0 << " "
+  << 0 << " " << 0 << "\n";
 
   return ss.str();
 }
@@ -138,6 +138,7 @@ string gen_Box(float x,float y,float z){
     ss << -x << " " << -y << " " << -z << "\n";
 
     return ss.str();
+
 }
 
 string prepareBox(float x,float y,float z){
@@ -147,124 +148,124 @@ string prepareBox(float x,float y,float z){
     stringstream ss;
 
     ss << x << " " << y << " " << z << " "
-       << 0 << " " << 1 << " " << 0 << " "
-       << 0.3 << " " << 0.5 << "\n";
+    << 0 << " " << 1 << " " << 0 << " "
+    << 0.3 << " " << 0.5 << "\n";
     ss << x << " " << y << " " << -z << " "
-       << 0 << " " << 1 << " " << 0 << " "
-       << 0.3 << " " << 1 << "\n";
+    << 0 << " " << 1 << " " << 0 << " "
+    << 0.3 << " " << 1 << "\n";
     ss << -x << " " << y << " " << -z << " "
-       << 0 << " " << 1 << " " << 0 << " "
-       << 0 << " " << 1 << "\n";
+    << 0 << " " << 1 << " " << 0 << " "
+    << 0 << " " << 1 << "\n";
 
     ss << x << " " << y << " " << z << " "
-       << 0 << " " << 1 << " " << 0 << " "
-       << 0.3 << " " << 0.5 << "\n";
+    << 0 << " " << 1 << " " << 0 << " "
+    << 0.3 << " " << 0.5 << "\n";
     ss << -x << " " << y << " " << -z << " "
-       << 0 << " " << 1 << " " << 0 << " "
-       << 0 << " " << 1 << "\n";
+    << 0 << " " << 1 << " " << 0 << " "
+    << 0 << " " << 1 << "\n";
     ss << -x << " " << y << " " << z << " "
-       << 0 << " " << 1 << " " << 0 << " "
-       << 0 << " " << 0.5 << "\n";
+    << 0 << " " << 1 << " " << 0 << " "
+    << 0 << " " << 0.5 << "\n";
 
     ss << x << " " << -y << " " << -z << " "
-       << 0 << " " << -1 << " " << 0 << " "
-       << 1 << " " << 0.5 << "\n";
+    << 0 << " " << -1 << " " << 0 << " "
+    << 1 << " " << 0.5 << "\n";
     ss << x << " " << -y << " " << z << " "
-       << 0 << " " << -1 << " " << 0 << " "
-       << 1 << " " << 1 << "\n";
+    << 0 << " " << -1 << " " << 0 << " "
+    << 1 << " " << 1 << "\n";
     ss << -x << " " << -y << " " << -z << " "
-       << 0 << " " << -1 << " " << 0 << " "
-       << 0.6 << " " << 0.5 << "\n";
+    << 0 << " " << -1 << " " << 0 << " "
+    << 0.6 << " " << 0.5 << "\n";
 
     ss << -x << " " << -y << " " << -z << " "
-       << 0 << " " << -1 << " " << 0 << " "
-       << 0.6 << " " << 0.5 << "\n";
+    << 0 << " " << -1 << " " << 0 << " "
+    << 0.6 << " " << 0.5 << "\n";
     ss << x << " " << -y << " " << z << " "
-       << 0 << " " << -1 << " " << 0 << " "
-       << 1 << " " << 1 << "\n";
+    << 0 << " " << -1 << " " << 0 << " "
+    << 1 << " " << 1 << "\n";
     ss << -x << " " << -y << " " << z << " "
-       << 0 << " " << -1 << " " << 0 << " "
-       << 0.6 << " " << 1 << "\n";
+    << 0 << " " << -1 << " " << 0 << " "
+    << 0.6 << " " << 1 << "\n";
 
     ss << x << " " << -y << " " << -z << " "
-       << 1 << " " << 0 << " " << 0 << " "
-       << 0.6 << " " << 0.5 << "\n";
+    << 1 << " " << 0 << " " << 0 << " "
+    << 0.6 << " " << 0.5 << "\n";
     ss << x << " " << y << " " << -z << " "
-       << 1 << " " << 0 << " " << 0 << " "
-       << 0.6 << " " << 1 << "\n";
+    << 1 << " " << 0 << " " << 0 << " "
+    << 0.6 << " " << 1 << "\n";
     ss << x << " " << y << " " << z << " "
-       << 1 << " " << 0 << " " << 0 << " "
-       << 0.3 << " " << 1 << "\n";
+    << 1 << " " << 0 << " " << 0 << " "
+    << 0.3 << " " << 1 << "\n";
 
     ss << x << " " << -y << " " << -z << " "
-       << 1 << " " << 0 << " " << 0 << " "
-       << 0.6 << " " << 0.5 << "\n";
+    << 1 << " " << 0 << " " << 0 << " "
+    << 0.6 << " " << 0.5 << "\n";
     ss << x << " " << y << " " << z << " "
-       << 1 << " " << 0 << " " << 0 << " "
-       << 0.3 << " " << 1 << "\n";
+    << 1 << " " << 0 << " " << 0 << " "
+    << 0.3 << " " << 1 << "\n";
     ss << x << " " << -y << " " << z << " "
-       << 1 << " " << 0 << " " << 0 << " "
-       << 0.3 << " " << 0.5 << "\n";
+    << 1 << " " << 0 << " " << 0 << " "
+    << 0.3 << " " << 0.5 << "\n";
 
     ss << -x << " " << y << " " << -z << " "
-       << -1 << " " << 0 << " " << 0 << " "
-       << 0 << " " << 0.5 << "\n";
+    << -1 << " " << 0 << " " << 0 << " "
+    << 0 << " " << 0.5 << "\n";
     ss << -x << " " << -y << " " << -z << " "
-       << -1 << " " << 0 << " " << 0 << " "
-       << 0 << " " << 0 << "\n";
+    << -1 << " " << 0 << " " << 0 << " "
+    << 0 << " " << 0 << "\n";
     ss << -x << " " << y << " " << z << " "
-       << -1 << " " << 0 << " " << 0 << " "
-       << 0.3 << " " << 0.5 << "\n";
+    << -1 << " " << 0 << " " << 0 << " "
+    << 0.3 << " " << 0.5 << "\n";
 
     ss << -x << " " << y << " " << z << " "
-       << -1 << " " << 0 << " " << 0 << " "
-       << 0.3 << " " << 0.5 << "\n";
+    << -1 << " " << 0 << " " << 0 << " "
+    << 0.3 << " " << 0.5 << "\n";
     ss << -x << " " << -y << " " << -z << " "
-       << -1 << " " << 0 << " " << 0 << " "
-       << 0 << " " << 0 << "\n";
+    << -1 << " " << 0 << " " << 0 << " "
+    << 0 << " " << 0 << "\n";
     ss << -x << " " << -y << " " << z << " "
-       << -1 << " " << 0 << " " << 0 << " "
-       << 0.3 << " " << 0 << "\n";
+    << -1 << " " << 0 << " " << 0 << " "
+    << 0.3 << " " << 0 << "\n";
 
     ss << x << " " << -y << " " << z << " "
-       << 0 << " " << 0 << " " << 1 << " "
-       << 0.6 << " " << 0 << "\n";
+    << 0 << " " << 0 << " " << 1 << " "
+    << 0.6 << " " << 0 << "\n";
     ss << x << " " << y << " " << z << " "
-       << 0 << " " << 0 << " " << 1 << " "
-       << 0.6 << " " << 0.5 << "\n";
+    << 0 << " " << 0 << " " << 1 << " "
+    << 0.6 << " " << 0.5 << "\n";
     ss << -x << " " << y << " " << z << " "
-       << 0 << " " << 0 << " " << 1 << " "
-       << 0.3 << " " << 0.5 << "\n";
+    << 0 << " " << 0 << " " << 1 << " "
+    << 0.3 << " " << 0.5 << "\n";
 
     ss << x << " " << -y << " " << z << " "
-       << 0 << " " << 0 << " " << 1 << " "
-       << 0.6 << " " << 0 << "\n";
+    << 0 << " " << 0 << " " << 1 << " "
+    << 0.6 << " " << 0 << "\n";
     ss << -x << " " << y << " " << z << " "
-       << 0 << " " << 0 << " " << 1 << " "
-       << 0.3 << " " << 0.5 << "\n";
+    << 0 << " " << 0 << " " << 1 << " "
+    << 0.3 << " " << 0.5 << "\n";
     ss << -x << " " << -y << " " << z << " "
-       << 0 << " " << 0 << " " << 1 << " "
-       << 0.3 << " " << 0 << "\n";
+    << 0 << " " << 0 << " " << 1 << " "
+    << 0.3 << " " << 0 << "\n";
 
     ss << x << " " << y << " " << -z << " "
-       << 0 << " " << 0 << " " << -1 << " "
-       << 0.6 << " " << 0.5 << "\n";
+    << 0 << " " << 0 << " " << -1 << " "
+    << 0.6 << " " << 0.5 << "\n";
     ss << x << " " << -y << " " << -z << " "
-       << 0 << " " << 0 << " " << -1 << " "
-       << 0.6 << " " << 0 << "\n";
+    << 0 << " " << 0 << " " << -1 << " "
+    << 0.6 << " " << 0 << "\n";
     ss << -x << " " << y << " " << -z << " "
-       << 0 << " " << 0 << " " << -1 << " "
-       << 1 << " " << 0.5 << "\n";
+    << 0 << " " << 0 << " " << -1 << " "
+    << 1 << " " << 0.5 << "\n";
 
     ss << -x << " " << y << " " << -z << " "
-       << 0 << " " << 0 << " " << -1 << " "
-       << 1 << " " << 0.5 << "\n";
+    << 0 << " " << 0 << " " << -1 << " "
+    << 1 << " " << 0.5 << "\n";
     ss << x << " " << -y << " " << -z << " "
-       << 0 << " " << 0 << " " << -1 << " "
-       << 0.6 << " " << 0 << "\n";
+    << 0 << " " << 0 << " " << -1 << " "
+    << 0.6 << " " << 0 << "\n";
     ss << -x << " " << -y << " " << -z << " "
-       << 0 << " " << 0 << " " << -1 << " "
-       << 1 << " " << 0 << "\n";
+    << 0 << " " << 0 << " " << -1 << " "
+    << 1 << " " << 0 << "\n";
 
     return ss.str();
 
@@ -302,6 +303,8 @@ string gen_Sphere(float radius,int slices,int stacks){
 
 string prepareSphere(float radius, int slices, int stacks) {
 
+	int vertex = 0;
+
 	float a_interval = 2 * M_PI / slices;
 	float b_interval = M_PI / stacks;
 	float next_a, next_b;
@@ -309,7 +312,7 @@ string prepareSphere(float radius, int slices, int stacks) {
 	float pi_div_2 = M_PI / 2;
 	float pi_mul_2 = 2 * M_PI;
 
-        stringstream ss;
+  stringstream ss;
 
 	for (float a = 0; a < 2 * M_PI; a += a_interval) {
 		for (float b = -M_PI / 2; b < M_PI / 2; b += b_interval) {
@@ -322,33 +325,34 @@ string prepareSphere(float radius, int slices, int stacks) {
 				next_b = M_PI / 2;
 			}
 
-			ss << radius * cos(next_b) * sin(next_a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(next_a) << " "			
-			   << (radius * cos(next_b) * sin(next_a))/radius << " " << (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
-			   << next_a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
-			
-			ss << radius * cos(next_b) * sin(a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(a) << " "
-      			   << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
-      			   << a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
+      ss << radius * cos(next_b) * sin(next_a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(next_a) << " "
+      << (radius * cos(next_b) * sin(next_a))/radius << " " << (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+      << next_a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
 
-      			ss << radius * cos(b) * sin(next_a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(next_a) << " "
-      			   << (radius * cos(next_b) * sin(next_a))/radius << " " << (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
-      			   << next_a / pi_mul_2 << " " << (b + pi_div_2) / M_PI << "\n";
+      ss << radius * cos(next_b) * sin(a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(a) << " "
+      << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+      << a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
+
+      ss << radius * cos(b) * sin(next_a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(next_a) << " "
+      << (radius * cos(next_b) * sin(next_a))/radius << " " << (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+      << next_a / pi_mul_2 << " " << (b + pi_div_2) / M_PI << "\n";
 
 			ss << radius * cos(b) * sin(next_a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(next_a) << " "
-			   << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
-		           << next_a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
+			<< (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+      << next_a / pi_mul_2 << " " << (b + pi_div_2)/ M_PI << "\n";
 
 			ss << radius * cos(next_b) * sin(a) << " " << radius * sin(next_b) << " " << radius * cos(next_b) * cos(a) << " "
-			   << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
-			   << a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
+			<< (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+			<< a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
 
 			ss << radius * cos(b) * sin(a) << " " << radius * sin(b) << " " << radius * cos(b) * cos(a) << " "
-			   << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
-			   << a / pi_mul_2 << " " << (b + pi_div_2) / M_PI << "\n";
+			<< (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+			<< a / pi_mul_2 << " " << (b + pi_div_2) / M_PI << "\n";
 
+			vertex += 6;
 		}
 	}
-        return ss.str();
+  return ss.str();
 }
 
 
@@ -416,13 +420,25 @@ string prepareCone(float radius,float height,int slices,int stacks){
             if (next_h > height) {
                 next_h = height;
             }
-            ss << radius * sin(next_a) * ((height - next_h) / height) << " " << next_h << " " << radius * cos(next_a) * ((height - next_h) / height) << "\n";
-            ss << radius * sin(a) * ((height - next_h) / height) << " " << next_h << " " << radius * cos(a) * ((height - next_h) / height) << "\n";
-            ss << radius * sin(next_a) * ((height - h) / height) << " " << h << " " << radius * cos(next_a) * ((height - h) / height) << "\n";
+            ss << radius * sin(next_a) * ((height - next_h) / height) << " " << next_h << " " << radius * cos(next_a) * ((height - next_h) / height) << " "
+            << cos(atan(radius/height))*cos(next_a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(next_a) << " "
+            << sin(next_a) * ((height - next_h) / height) * cos(next_a)  << " " << next_h/height << "\n";
+            ss << radius * sin(a) * ((height - next_h) / height) << " " << next_h << " " << radius * cos(a) * ((height - next_h) / height) << " "
+            << cos(atan(radius/height))*cos(a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(a) << " "
+            << sin(a) * ((height - next_h) / height) * cos(a)  << " " << next_h/height << "\n";
+            ss << radius * sin(next_a) * ((height - h) / height) << " " << h << " " << radius * cos(next_a) * ((height - h) / height) << " "
+            << cos(atan(radius/height))*cos(next_a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(next_a) << " "
+            << sin(next_a) * ((height - next_h) / height) * cos(next_a)  << " " << next_h/height << "\n";
 
-            ss << radius * sin(a) * ((height - next_h) / height) << " " << next_h << " " << radius * cos(a) * ((height - next_h) / height) << "\n";
-            ss << radius * sin(a) * ((height - h) / height) << " " << h << " " << radius * cos(a) * ((height - h) / height) << "\n";
-            ss << radius * sin(next_a) * ((height - h) / height) << " " << h << " " << radius * cos(next_a) * ((height - h) / height) << "\n";
+            ss << radius * sin(a) * ((height - next_h) / height) << " " << next_h << " " << radius * cos(a) * ((height - next_h) / height) << " "
+            << cos(atan(radius/height))*cos(a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(a) << " "
+            << sin(a) * ((height - next_h) / height) * cos(a)  << " " << next_h/height << "\n";
+            ss << radius * sin(a) * ((height - h) / height) << " " << h << " " << radius * cos(a) * ((height - h) / height) << " "
+            << cos(atan(radius/height))*cos(a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(a) << " "
+            << sin(a) * ((height - next_h) / height) * cos(a)  << " " << next_h/height << "\n";
+            ss << radius * sin(next_a) * ((height - h) / height) << " " << h << " " << radius * cos(next_a) * ((height - h) / height) << " "
+            << cos(atan(radius/height))*cos(next_a) << " " << sin(atan(radius/height)) << " " << cos(atan(radius/height))*sin(next_a) << " "
+            << sin(next_a) * ((height - next_h) / height) * cos(next_a)  << " " << next_h/height << "\n";  
 
         }
     }
@@ -573,7 +589,7 @@ int main(int argc, char* argv[]){
               int slices = atoi(argv[4]);
               int stacks = atoi(argv[5]);
               fname = argv[6];
-              res = gen_Cone(radius,height,slices,stacks);
+              res = prepareCone(radius,height,slices,stacks);
     } else if(fig == "bezier"){
               if(argc < 5){
                  cout << "\nError! Invalid number of arguments.\n";
