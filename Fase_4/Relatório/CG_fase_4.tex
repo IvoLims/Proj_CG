@@ -9,6 +9,7 @@
 \usepackage{color}
 \usepackage{multicol}
 \usepackage{indentfirst}
+\usepackage{multicol}
 
 \definecolor{myblue}{rgb}{0.2,0.2,0.8}
 \definecolor{mygray}{rgb}{0.5,0.5,0.5}
@@ -132,10 +133,245 @@ Posto isto, estabelecemos um conjunto de tarefas que incidiram tanto sobre o \em
 \item Introduzir uma câmara fps, assim como outras features para facilitar o debug/visualização do ambiente;
 \end{enumerate}
 \chapter{Atualização do \emph{generator}}
-\section{Nova configuração de geração de modelos}
 
-Segue-se uma breve descrição daquilo que foi alterado tanto a nível dos algoritmos dos modelos como a geração das normais, coordenadas de textura, entre outros.
+Com a introdução desta fase, percebemos que para se dar a criação das normais e das coordenadas de textura apenas teriamos de fazer uma leve atualização na estratégia adotada até ao momento, ou seja, após a geração dos três pontos que definem um dos três vértices do triângulo serão introduzidas três coordenadas para as normais e outras duas que representarão os pontos da textura.
 
+\section{Nova configuração de geração dos pontos}
+
+Tendo isto posto, segue-se nas próximas secções uma breve descrição daquilo que foi alterado através da apresentação do código para gerar as normais e as coordenadas de textura.
+\newpage
+\subsection{\emph{Plane}}
+
+Neste primeiro caso um dos mais simples foram acrescentadas as linhas apresentadas a seguir:
+
+\begin{multicols}{2}
+\begin{lstlisting}[style = code]
+     ...
+     << 0 << " " << 1 << " " << 0 << " "
+     << 1 << " " << 0 << "\n";
+     ...
+     << 0 << " " << 1 << " " << 0 << " "
+     << 1 << " " << 1 << "\n";
+     ...
+     << 0 << " " << 1 << " " << 0 << " "
+     << 0 << " " << 1 << "\n";
+
+     ...
+     << 0 << " " << 1 << " " << 0 << " "
+     << 1 << " " << 0 << "\n";
+     ...
+     << 0 << " " << 1 << " " << 0 << " "
+     << 0 << " " << 1 << "\n";
+     ...
+     << 0 << " " << 1 << " " << 0 << " "
+     << 0 << " " << 0 << "\n";
+
+     ...
+     << 0 << " " << -1 << " " << 0 << " "
+     << 1 << " " << 1 << "\n";
+     ...
+     << 0 << " " << -1 << " " << 0 << " "
+     << 1 << " " << 0 << "\n";
+     ...
+     << 0 << " " << -1 << " " << 0 << " "
+     << 0 << " " << 1 << "\n";
+
+     ...
+     << 0 << " " << -1 << " " << 0 << " "
+     << 0 << " " << 1 << "\n";
+     ...
+     << 0 << " " << -1 << " " << 0 << " "
+     << 1 << " " << 0 << "\n";
+     ...
+     << 0 << " " << -1 << " " << 0 << " "
+     << 0 << " " << 0 << "\n";
+\end{lstlisting}
+\end{multicols}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{plane.png}
+\end{figure}
+
+\newpage
+\subsection{\emph{Box}}
+
+A \emph{Box} já começou a exigir um pouco mais de racíocínio e fez com que tivéssemos de acertar de alguns pontos e acabou ficando assim:
+
+\begin{multicols}{3}
+\begin{lstlisting}[style = code]
+       ...
+       << 0 << " " << 1 << " " << 0 << " "
+       << 0.3 << " " << 0.5 << "\n";
+       ...
+       << 0 << " " << 1 << " " << 0 << " "
+       << 0.3 << " " << 1 << "\n";
+       ...
+       << 0 << " " << 1 << " " << 0 << " "
+       << 0 << " " << 1 << "\n";
+
+       ...
+       << 0 << " " << 1 << " " << 0 << " "
+       << 0.3 << " " << 0.5 << "\n";
+       ...
+       << 0 << " " << 1 << " " << 0 << " "
+       << 0 << " " << 1 << "\n";
+       ...
+       << 0 << " " << 1 << " " << 0 << " "
+       << 0 << " " << 0.5 << "\n";
+
+       ...
+       << 0 << " " << -1 << " " << 0 << " "
+       << 1 << " " << 0.5 << "\n";
+       ...
+       << 0 << " " << -1 << " " << 0 << " "
+       << 1 << " " << 1 << "\n";
+       ...
+       << 0 << " " << -1 << " " << 0 << " "
+       << 0.6 << " " << 0.5 << "\n";
+
+       ...
+       << 0 << " " << -1 << " " << 0 << " "
+       << 0.6 << " " << 0.5 << "\n";
+       ...
+       << 0 << " " << -1 << " " << 0 << " "
+       << 1 << " " << 1 << "\n";
+       ...
+       << 0 << " " << -1 << " " << 0 << " "
+       << 0.6 << " " << 1 << "\n";
+
+       ...
+       << 1 << " " << 0 << " " << 0 << " "
+       << 0.6 << " " << 0.5 << "\n";
+       ...
+       << 1 << " " << 0 << " " << 0 << " "
+       << 0.6 << " " << 1 << "\n";
+       ...
+       << 1 << " " << 0 << " " << 0 << " "
+       << 0.3 << " " << 1 << "\n";
+
+       ...
+       << 1 << " " << 0 << " " << 0 << " "
+       << 0.6 << " " << 0.5 << "\n";
+       ...
+       << 1 << " " << 0 << " " << 0 << " "
+       << 0.3 << " " << 1 << "\n";
+       ...
+       << 1 << " " << 0 << " " << 0 << " "
+       << 0.3 << " " << 0.5 << "\n";
+
+       ...
+       << -1 << " " << 0 << " " << 0 << " "
+       << 0 << " " << 0.5 << "\n";
+       ...
+       << -1 << " " << 0 << " " << 0 << " "
+       << 0 << " " << 0 << "\n";
+       ...
+       << -1 << " " << 0 << " " << 0 << " "
+       << 0.3 << " " << 0.5 << "\n";
+
+       ...
+       << -1 << " " << 0 << " " << 0 << " "
+       << 0.3 << " " << 0.5 << "\n";
+       ...
+       << -1 << " " << 0 << " " << 0 << " "
+       << 0 << " " << 0 << "\n";
+       ...
+       << -1 << " " << 0 << " " << 0 << " "
+       << 0.3 << " " << 0 << "\n";
+
+        ...
+       << 0 << " " << 0 << " " << 1 << " "
+       << 0.6 << " " << 0 << "\n";
+       ...
+       << 0 << " " << 0 << " " << 1 << " "
+       << 0.6 << " " << 0.5 << "\n";
+       ...
+       << 0 << " " << 0 << " " << 1 << " "
+       << 0.3 << " " << 0.5 << "\n";
+
+       ...
+       << 0 << " " << 0 << " " << 1 << " "
+       << 0.6 << " " << 0 << "\n";
+       ...
+       << 0 << " " << 0 << " " << 1 << " "
+       << 0.3 << " " << 0.5 << "\n";
+       ...
+       << 0 << " " << 0 << " " << 1 << " "
+       << 0.3 << " " << 0 << "\n";
+
+       ...
+       << 0 << " " << 0 << " " << -1 << " "
+       << 0.6 << " " << 0.5 << "\n";
+       ...
+       << 0 << " " << 0 << " " << -1 << " "
+       << 0.6 << " " << 0 << "\n";
+       ...
+       << 0 << " " << 0 << " " << -1 << " "
+       << 1 << " " << 0.5 << "\n";
+
+       ...
+       << 0 << " " << 0 << " " << -1 << " "
+       << 1 << " " << 0.5 << "\n";
+       ...
+       << 0 << " " << 0 << " " << -1 << " "
+       << 0.6 << " " << 0 << "\n";
+       ...
+       << 0 << " " << 0 << " " << -1 << " "
+       << 1 << " " << 0 << "\n";
+\end{lstlisting}
+\end{multicols}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{box.png}
+\end{figure}
+
+\subsection{\emph{Sphere}}
+
+Nesta figura os cálculos ficaram da seguinte maneira:
+\begin{multicols}{2}
+\begin{lstlisting}[style = code]
+       ...	
+      << (radius * cos(next_b) * sin(next_a))/radius << " " << (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+      << next_a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
+			
+       ...
+      << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+      << a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
+
+       ...
+      << (radius * cos(next_b) * sin(next_a))/radius << " " << (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+      << next_a / pi_mul_2 << " " << (b + pi_div_2) / M_PI << "\n";
+
+       ...
+      << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+      << next_a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
+
+       ...
+      << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+      << a / pi_mul_2 << " " << (next_b + pi_div_2)/ M_PI << "\n";
+
+       ...
+      << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
+      << a / pi_mul_2 << " " << (b + pi_div_2) / M_PI << "\n";
+\end{lstlisting}
+\end{multicols}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.40\textwidth]{sphere.png}
+\end{figure}
+\newpage
+\subsection{\emph{Cone}}
+Por fim foi adicionado o seguinte:
+\begin{multicols}{2}
+\begin{lstlisting}[style = code]
+blah
+\end{lstlisting}
+\end{multicols}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{sphere.png}
+\end{figure}
 \chapter{Atualização da \emph{engine}}
 
 \section{Nova configuração do xml}
@@ -340,13 +576,13 @@ O raciocínio passa por considerar que a câmara possui uma posição \emph{P} e
 
 Já o movimento lateral pode ser obtido calculando o vetor resultante do up com a direção do olhar multiplicando o resultado por -1 ou 1 caso seja para a esquerda ou direita ( teclas $\leftarrow$ e $\rightarrow$ ).
 
-A mesma também consegue olhar à sua volta, rodar em todos os sentidos utilizando os ângulo alfa e beta para definir a posição do olhar com coordenadas esféricas ( movimento de \emph{drag} com o rato ).
+A mesma também consegue olhar à sua volta e rodar sobre o seu próprio eixo utilizando os ângulo alfa e beta para definir a posição do olhar com coordenadas esféricas ( movimento de \emph{drag} com o rato ).
 
 As variáveis de controlo da câmara bem como a sua aplicação encontra-se definida em na \emph{engine.cpp}.
 
 \chapter{Resultado Final}
 
-Nesta última fase conseguimos juntar tudo o que aprendemos o que culminou na criação da seguinte demonstração:
+Conseguimos portanto nesta última fase juntar tudo o que aprendemos o que culminou na criação deste magnífico Sistema Solar.
 
 Imagem do Sistema Solar Final.
 
