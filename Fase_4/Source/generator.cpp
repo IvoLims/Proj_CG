@@ -302,8 +302,6 @@ string gen_Sphere(float radius,int slices,int stacks){
 
 string prepareSphere(float radius, int slices, int stacks) {
 
-	int vertex = 0;
-
 	float a_interval = 2 * M_PI / slices;
 	float b_interval = M_PI / stacks;
 	float next_a, next_b;
@@ -348,7 +346,6 @@ string prepareSphere(float radius, int slices, int stacks) {
 			   << (radius * cos(next_b) * sin(next_a))/radius << " " <<  (radius * sin(next_b))/radius << " " << (radius * cos(next_b) * cos(next_a))/radius << " "
 			   << a / pi_mul_2 << " " << (b + pi_div_2) / M_PI << "\n";
 
-			vertex += 6;
 		}
 	}
         return ss.str();
