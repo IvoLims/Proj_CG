@@ -565,7 +565,7 @@ A textura será depois ativada na renderScene antes de desenhar cada modelo atra
 
 \subsection{CMakeLists}
 
-Uma vez que o nosso projeto começou a crescer e quantidade de \emph{features} que o mesmo deve permitir fazer também resolvemos gastar um pouco do nosso tempo a atualizar o \emph{CMakeList}. 
+Uma vez que o nosso projeto começou a crescer e a quantidade de \emph{features} também resolvemos gastar um pouco do nosso tempo a atualizar o \emph{CMakeList}. 
 
 Para além da óbvia verificação e cópia da \emph{DevIL.lib} da pasta \emph{TOOLKITS\_FOLDER} resolvemos anular o trabalho de toda a vez que faziamos o \emph{Configure} e \emph{Generate} no programa \emph{CMake} ter de inserir manualmente na pasta \emph{build} os ficheiros com as figuras do tipo \emph{xxx.3d}, as texturas com a assinatura \emph{xxx.jpg} e ainda o \emph{xmlconf.xml}. Portanto por questões de organização esses ficheiro devem estar em pastas para que as suas diretivas possam ser passadas ao programa, a nova pasta \emph{FIGTEX\_FOLDER} deverá conter duas subpastas a \emph{textures} bem como a \emph{figs}, já o \emph{XML\_FOLDER} precisará conter uma subpasta \emph{config} com um ficheiro nomeado de \emph{xmlconf.xml}.
 \begin{lstlisting}[style = cmake]
