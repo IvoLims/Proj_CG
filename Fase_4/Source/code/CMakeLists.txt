@@ -28,7 +28,7 @@ if  (WIN32)
 	set(TOOLKITS_FOLDER "" CACHE PATH "Path to Toolkits folder")
 
 	message(STATUS "Xml_DIR set to: " ${XML_FOLDER})
-    set(XML_FOLDER "" CACHE PATH "Path to XML folder")
+        set(XML_FOLDER "" CACHE PATH "Path to XML folder")
 
 	message(STATUS "FigTex_DIR set to: " ${FIGTEX_FOLDER})
 	set(FIGTEX_FOLDER "" CACHE PATH "Path to FIGTEX folder")
