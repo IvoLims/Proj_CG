@@ -83,8 +83,8 @@ else (WIN32) #Linux and Mac
 	add_definitions(${GLUT_DEFINITIONS})
 	
 	find_package(DevIL REQUIRED)
-    link_libraries(${IL_LIBRARIES} )
-    include_directories(${IL_INCLUDE_DIR})
+        link_libraries(${IL_LIBRARIES} )
+        include_directories(${IL_INCLUDE_DIR})
 
 	if (NOT APPLE)
 		find_package(GLEW REQUIRED)
