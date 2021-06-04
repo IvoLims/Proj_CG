@@ -29,7 +29,6 @@ using namespace tinyxml2;
 #define R_JUMP 4
 #define ALPHA_JUMP 0.1
 #define BETA_JUMP 0.08
-#define UNIT 15
 #define CATMULL_MAX 10
 
 //Explorer Mode Camera
