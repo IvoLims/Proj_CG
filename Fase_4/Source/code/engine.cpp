@@ -155,7 +155,7 @@ void drawAxis() {
 	glColor3f(0.4f, 0.5f, 0.5f);
 }
 
-int loadTexture(std::string s) {
+int loadTexture(string s) {
 
 	unsigned int t, tw, th;
 	unsigned char* texData;
@@ -677,7 +677,6 @@ void onKeyDown(int key, int x, int y) {
 	case GLUT_KEY_UP: {
 		if (fpsOn == false) {
 			r -= R_JUMP;
-			break;
 		}
 		front = true;
 		break;
@@ -750,7 +749,6 @@ int main(int argc, char** argv) {
 	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	//glPolygonMode(GL_FRONT, GL_LINE);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
